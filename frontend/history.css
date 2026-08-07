@@ -1163,6 +1163,11 @@ border-top:1px solid rgba(255,255,255,.08);
         text-align:left;
 
     }
+    .settlement-left{
+
+        width:100%;
+
+    }
 
     .settlement-item{
 
@@ -1180,9 +1185,13 @@ border-top:1px solid rgba(255,255,255,.08);
 
     justify-content:flex-start;
 
+    align-items:center;
+
     gap:10px;
 
     flex-wrap:wrap;
+
+    margin-top:12px;
 
 }
 
