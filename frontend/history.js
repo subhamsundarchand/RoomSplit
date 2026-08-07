@@ -253,54 +253,32 @@ item.status !== "Paid"
             <div class="expense-right">
 
     <h2>
-
         ₹${Number(expense.amount).toFixed(2)}
-
     </h2>
 
     <small class="expense-date">
-
-        ${expense.createdAt
-            ? new Date(expense.createdAt).toLocaleString("en-IN", {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit"
-            })
-            : ""}
-
+        ${formatExpenseDate(expense.createdAt)}
     </small>
 
     <div class="actions">
 
-                <h2>
+        <button
+            onclick="editExpense('${expense.id}')">
 
-    ₹${Number(expense.amount).toFixed(2)}
+            <i class="fa-solid fa-pen"></i>
 
-</h2>
+        </button>
 
-<small class="expense-date">
+        <button
+            onclick="removeExpense(this,'${expense.id}')">
 
-    ${formatExpenseDate(expense.createdAt)}
+            <i class="fa-solid fa-trash"></i>
 
-</small>
+        </button>
 
-<div class="actions">
+    </div>
 
-                    <button
-                        onclick="editExpense('${expense.id}')">
-
-                        <i class="fa-solid fa-pen"></i>
-
-                    </button>
-
-                    <button
-    onclick="removeExpense(this,'${expense.id}')">
-
-                        <i class="fa-solid fa-trash"></i>
-
-                    </button>
+</div>
 
                 </div>
 
@@ -438,11 +416,21 @@ function getName(id) {
    DATE FORMAT
 ========================================== */
 
-function formatExpenseDate(date) {
+function formatExpenseDate(createdAt) {
 
-    if (!date) return "";
+    if (!createdAt) return "";
 
-    const d = new Date(date);
+    let d;
+
+    if (createdAt._seconds) {
+
+        d = new Date(createdAt._seconds * 1000);
+
+    } else {
+
+        d = new Date(createdAt);
+
+    }
 
     const now = new Date();
 
@@ -453,6 +441,7 @@ function formatExpenseDate(date) {
     );
 
     const yesterday = new Date(today);
+
     yesterday.setDate(today.getDate() - 1);
 
     const expenseDay = new Date(
@@ -462,47 +451,36 @@ function formatExpenseDate(date) {
     );
 
     const time = d.toLocaleTimeString("en-IN", {
-
         hour: "2-digit",
-
         minute: "2-digit",
-
         hour12: true
-
     });
 
     if (expenseDay.getTime() === today.getTime()) {
 
-        return `🕒 Today • ${time}`;
+        return `Today • ${time}`;
 
     }
 
     if (expenseDay.getTime() === yesterday.getTime()) {
 
-        return `🕒 Yesterday • ${time}`;
+        return `Yesterday • ${time}`;
 
     }
 
     if (d.getFullYear() === now.getFullYear()) {
 
-        return `📅 ${d.toLocaleDateString("en-IN", {
-
+        return `${d.toLocaleDateString("en-IN", {
             day: "2-digit",
-
             month: "short"
-
         })} • ${time}`;
 
     }
 
-    return `📅 ${d.toLocaleDateString("en-IN", {
-
+    return `${d.toLocaleDateString("en-IN", {
         day: "2-digit",
-
         month: "short",
-
         year: "numeric"
-
     })} • ${time}`;
 
 }
