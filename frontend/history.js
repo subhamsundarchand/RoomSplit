@@ -226,67 +226,50 @@ item.status !== "Paid"
 
         <div class="expense-item">
 
-            <div class="expense-left">
+    <div class="expense-header">
 
-                <h3>${expense.title}</h3>
+        <div class="expense-info">
 
-                <small>
+            <h3>${expense.title}</h3>
 
-                    ${expense.category}
+            <small>
+                ${expense.category} • Paid by ${getName(expense.paidBy)}
+            </small>
 
-                    •
+        </div>
 
-                    Paid by ${getName(expense.paidBy)}
+        <div class="expense-top-right">
 
-                </small>
+            <h2>₹${Number(expense.amount).toFixed(2)}</h2>
 
-                <div class="settlement-box">
+            <small class="expense-date">
+                ${formatExpenseDate(expense.createdAt)}
+            </small>
 
-                    <b>Settlement</b>
-
-                    ${settlementHTML}
-
-                </div>
-
-            </div>
-
-            <div class="expense-right">
-
-    <h2>
-        ₹${Number(expense.amount).toFixed(2)}
-    </h2>
-
-    <small class="expense-date">
-        <small class="expense-date">
-    ${formatExpenseDate(expense.createdAt) || ""}
-</small>
-    </small>
-
-    <div class="actions">
-
-        <button
-            onclick="editExpense('${expense.id}')">
-
-            <i class="fa-solid fa-pen"></i>
-
-        </button>
-
-        <button
-            onclick="removeExpense(this,'${expense.id}')">
-
-            <i class="fa-solid fa-trash"></i>
-
-        </button>
+        </div>
 
     </div>
 
-</div>
+    <div class="settlement-box">
 
-                </div>
+        <b>Settlement</b>
 
-            </div>
+        ${settlementHTML}
 
-        </div>
+    </div>
+
+    <div class="expense-footer">
+
+        <button onclick="editExpense('${expense.id}')">
+            <i class="fa-solid fa-pen"></i>
+        </button>
+
+        <button onclick="removeExpense(this,'${expense.id}')">
+            <i class="fa-solid fa-trash"></i>
+        </button>
+         </div>
+
+    </div>
 
         `;
 

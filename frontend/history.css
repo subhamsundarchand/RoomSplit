@@ -86,21 +86,17 @@
 
     display:flex;
 
-    justify-content:space-between;
+    flex-direction:column;
 
-    align-items:center;
+    gap:20px;
 
-    padding:20px;
+    padding:22px;
 
     border-radius:18px;
 
     background:var(--glass);
 
     border:1px solid rgba(255,255,255,.08);
-
-    backdrop-filter:blur(18px);
-
-    transition:.3s;
 
 }
 
@@ -109,118 +105,6 @@
     transform:translateY(-2px);
 
     border-color:var(--primary);
-
-}
-
-/* ==========================================
-   LEFT
-========================================== */
-
-.expense-left h3{
-
-    font-size:18px;
-
-    margin-bottom:8px;
-
-}
-
-.expense-left small{
-
-    color:var(--text-light);
-
-    font-size:13px;
-
-}
-
-/* ==========================================
-   RIGHT
-========================================== */
-
-.expense-right{
-
-    display:flex;
-
-    flex-direction:column;
-
-    align-items:flex-end;
-
-    gap:12px;
-
-}
-.expense-right{
-
-    text-align:right;
-
-}
-.expense-date{
-
-    display:block;
-
-    margin-top:8px;
-
-    margin-bottom:14px;
-
-    color:#9CA3AF;
-
-    font-size:13px;
-
-    font-weight:500;
-
-    line-height:1.4;
-
-}
-
-.expense-right h2{
-
-    font-size:22px;
-
-}
-
-/* ==========================================
-   ACTIONS
-========================================== */
-
-.actions{
-
-    display:flex;
-
-    gap:10px;
-
-}
-
-.actions button{
-
-    width:42px;
-
-    height:42px;
-
-    border:none;
-
-    border-radius:12px;
-
-    color:white;
-
-    cursor:pointer;
-
-    transition:.3s;
-
-}
-
-.actions button:first-child{
-
-    background:#3B82F6;
-
-}
-
-.actions button:last-child{
-
-    background:#EF4444;
-
-}
-
-.actions button:hover{
-
-    transform:scale(1.08);
 
 }
 
@@ -460,16 +344,18 @@
 }
 .settlement-box{
     margin-top:12px;
-    border-top:1px solid #eee;
+    border-top:1px solid rgba(255,255,255,.08);
     padding-top:10px;
 }
 
-.settlement-item{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:12px;
-    gap:16px;
+.settlement-actions{
+
+display:flex;
+
+gap:10px;
+
+flex-wrap:wrap;
+
 }
 .settlement-item:last-child{
     margin-bottom:0;
@@ -1233,5 +1119,187 @@
     font-weight:500;
 
     letter-spacing:.3px;
+
+}
+.expense-header{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:flex-start;
+
+width:100%;
+
+gap:18px;
+
+}
+
+.expense-top-right{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:flex-end;
+
+    gap:6px;
+
+}
+.expense-top-right{
+
+    align-items:flex-start;
+
+}
+
+.expense-footer{
+
+display:flex;
+
+justify-content:flex-end;
+
+width:100%;
+
+gap:12px;
+
+padding-top:16px;
+
+border-top:1px solid rgba(255,255,255,.08);
+
+}
+
+
+@media(max-width:768px){
+
+.expense-header{
+
+flex-direction:column;
+
+}
+
+.expense-top-right{
+
+text-align:left;
+
+width:100%;
+
+}
+
+.settlement-item{
+
+flex-direction:column;
+
+align-items:flex-start;
+
+}
+.settlement-item{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:20px;
+
+    padding:14px 0;
+
+    border-bottom:1px solid rgba(255,255,255,.08);
+
+}
+
+.settlement-item:last-child{
+
+    border-bottom:none;
+
+}
+.settlement-actions button{
+
+    height:42px;
+
+    padding:0 16px;
+
+    border:none;
+
+    border-radius:10px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+}
+
+.settlement-actions{
+
+width:100%;
+
+}
+
+.settlement-actions button{
+
+flex:1;
+
+}
+
+.expense-footer{
+
+justify-content:flex-start;
+
+}
+
+}
+
+
+
+
+.expense-info h3{
+
+font-size:20px;
+
+margin-bottom:6px;
+
+}
+
+.expense-info small{
+
+color:#94A3B8;
+
+font-size:13px;
+
+}
+.settlement-box b{
+
+    display:block;
+
+    margin-bottom:14px;
+
+    font-size:15px;
+
+}
+.expense-footer button{
+
+    width:42px;
+
+    height:42px;
+
+    border:none;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    color:#fff;
+
+}
+
+.expense-footer button:first-child{
+
+    background:#2563EB;
+
+}
+
+.expense-footer button:last-child{
+
+    background:#EF4444;
 
 }
