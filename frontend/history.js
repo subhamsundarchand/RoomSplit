@@ -252,13 +252,41 @@ item.status !== "Paid"
 
             <div class="expense-right">
 
+    <h2>
+
+        ₹${Number(expense.amount).toFixed(2)}
+
+    </h2>
+
+    <small class="expense-date">
+
+        ${expense.createdAt
+            ? new Date(expense.createdAt).toLocaleString("en-IN", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            })
+            : ""}
+
+    </small>
+
+    <div class="actions">
+
                 <h2>
 
-                    ₹${Number(expense.amount).toFixed(2)}
+    ₹${Number(expense.amount).toFixed(2)}
 
-                </h2>
+</h2>
 
-                <div class="actions">
+<small class="expense-date">
+
+    ${formatExpenseDate(expense.createdAt)}
+
+</small>
+
+<div class="actions">
 
                     <button
                         onclick="editExpense('${expense.id}')">
@@ -404,6 +432,78 @@ function getName(id) {
             return id;
 
     }
+
+}
+/* ==========================================
+   DATE FORMAT
+========================================== */
+
+function formatExpenseDate(date) {
+
+    if (!date) return "";
+
+    const d = new Date(date);
+
+    const now = new Date();
+
+    const today = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate()
+    );
+
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+
+    const expenseDay = new Date(
+        d.getFullYear(),
+        d.getMonth(),
+        d.getDate()
+    );
+
+    const time = d.toLocaleTimeString("en-IN", {
+
+        hour: "2-digit",
+
+        minute: "2-digit",
+
+        hour12: true
+
+    });
+
+    if (expenseDay.getTime() === today.getTime()) {
+
+        return `🕒 Today • ${time}`;
+
+    }
+
+    if (expenseDay.getTime() === yesterday.getTime()) {
+
+        return `🕒 Yesterday • ${time}`;
+
+    }
+
+    if (d.getFullYear() === now.getFullYear()) {
+
+        return `📅 ${d.toLocaleDateString("en-IN", {
+
+            day: "2-digit",
+
+            month: "short"
+
+        })} • ${time}`;
+
+    }
+
+    return `📅 ${d.toLocaleDateString("en-IN", {
+
+        day: "2-digit",
+
+        month: "short",
+
+        year: "numeric"
+
+    })} • ${time}`;
 
 }
 /* ==========================================

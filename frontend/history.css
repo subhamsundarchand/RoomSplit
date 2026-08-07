@@ -147,6 +147,28 @@
     gap:12px;
 
 }
+.expense-right{
+
+    text-align:right;
+
+}
+.expense-date{
+
+    display:block;
+
+    margin-top:8px;
+
+    margin-bottom:14px;
+
+    color:#9CA3AF;
+
+    font-size:13px;
+
+    font-weight:500;
+
+    line-height:1.4;
+
+}
 
 .expense-right h2{
 
@@ -1194,5 +1216,22 @@
     color:#9CA3AF;
 
     font-weight:500;
+
+}
+.expense-date{
+
+    display:block;
+
+    margin-top:8px;
+
+    margin-bottom:14px;
+
+    color:#94A3B8;
+
+    font-size:13px;
+
+    font-weight:500;
+
+    letter-spacing:.3px;
 
 }
