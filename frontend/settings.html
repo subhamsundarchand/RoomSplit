@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Settings</title>
+
+<link rel="stylesheet"
+href="common.css">
+
+<link rel="stylesheet"
+href="settings.css">
+<link rel="stylesheet" href="toast.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>⚙️ Settings</h2>
+
+<div class="card">
+
+<h3>Notifications</h3>
+
+<label>
+
+<input
+type="checkbox"
+id="pushNotification">
+
+Enable Push Notification
+
+</label>
+
+<br><br>
+
+<label>
+
+<input
+type="checkbox"
+id="whatsappReminder">
+
+Enable WhatsApp Reminder
+
+</label>
+
+</div>
+
+<br>
+
+<div class="card">
+
+<label>
+
+Reminder After
+
+</label>
+
+<br>
+
+<select id="reminderAfter">
+
+<option value="1">1 Day</option>
+
+<option value="3">3 Days</option>
+
+<option value="5">5 Days</option>
+
+<option value="7">7 Days</option>
+
+<option value="15">15 Days</option>
+
+</select>
+
+<br><br>
+
+<label>
+
+Repeat Every
+
+</label>
+
+<br>
+
+<select id="repeatEvery">
+
+<option value="1">Every Day</option>
+
+<option value="2">Every 2 Days</option>
+
+<option value="3">Every 3 Days</option>
+
+<option value="7">Every Week</option>
+
+</select>
+
+</div>
+
+<br>
+
+<button id="saveBtn">
+
+Save Settings
+
+</button>
+
+</div>
+<div class="settings-card">
+
+    <h3>WhatsApp Test</h3>
+
+    <button
+        class="save-btn"
+        onclick="testWhatsApp()">
+
+        📱 Send Test Message
+
+    </button>
+
+</div>
+
+<script src="toast.js"></script>
+<script src="settings.js"></script>
+
+</body>
+
+</html>

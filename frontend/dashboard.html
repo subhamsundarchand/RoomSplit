@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>RoomSplit | Dashboard</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="common.css">
+    <link rel="stylesheet" href="dashboard.css">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- HEADER -->
+
+        <header class="top-bar">
+
+            <div>
+
+                <h2 id="welcomeText">
+
+                    Hi 👋
+
+                </h2>
+
+                <p id="roomText">
+
+                    Room
+
+                </p>
+
+            </div>
+
+            <button id="logoutBtn">
+
+                <i class="fa-solid fa-right-from-bracket"></i>
+
+            </button>
+
+        </header>
+
+        <!-- SUMMARY -->
+
+        <section class="summary">
+
+            <div class="summary-card">
+
+                <h3>Total Expense</h3>
+
+                <h1 id="totalExpense">
+
+                    ₹0
+
+                </h1>
+
+            </div>
+
+            <div class="summary-card">
+
+                <h3>Your Balance</h3>
+
+                <h1 id="yourBalance">
+
+                    ₹0
+
+                </h1>
+
+            </div>
+
+        </section>
+
+        <!-- QUICK ACTION -->
+
+        <section class="quick-actions">
+
+            <a href="add-expense.html" class="action-card">
+
+                <i class="fa-solid fa-plus"></i>
+
+                <span>Add Expense</span>
+
+            </a>
+
+            <a href="history.html" class="action-card">
+
+                <i class="fa-solid fa-clock-rotate-left"></i>
+
+                <span>History</span>
+
+            </a>
+
+            <a href="settlement.html" class="action-card">
+
+                <i class="fa-solid fa-money-bill-transfer"></i>
+
+                <span>Settlement</span>
+
+            </a>
+            <a href="analytics.html" class="action-card">
+
+    <i class="fa-solid fa-chart-line"></i>
+
+    <span>Analytics</span>
+
+</a>
+
+</a>
+
+        </section>
+
+        <!-- RECENT -->
+
+        <section class="recent-expense">
+
+            <div class="section-title">
+
+                <h3>
+
+                    Recent Expenses
+
+                </h3>
+
+            </div>
+
+            <div id="recentExpenseList">
+
+                <div class="empty-state">
+
+                    <i class="fa-solid fa-receipt"></i>
+
+                    <p>
+
+                        No expenses added yet.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+<script src="api.js"></script>
+<script src="dashboard.js"></script>
+
+</body>
+
+</html>

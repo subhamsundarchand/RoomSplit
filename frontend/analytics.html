@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>RoomSplit | Expense Analytics</title>
+
+    <!-- Google Font -->
+
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+    <!-- Font Awesome -->
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <!-- CSS -->
+
+    <link rel="stylesheet"
+          href="common.css">
+
+    <link rel="stylesheet"
+          href="analytics.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- ===========================
+         HEADER
+    ============================ -->
+
+    <header class="page-header">
+
+        <a href="dashboard.html">
+
+            <i class="fa-solid fa-arrow-left"></i>
+
+        </a>
+
+        <h2>
+
+            Expense Analytics
+
+        </h2>
+
+    </header>
+
+    <!-- ===========================
+         FILTERS
+    ============================ -->
+
+    <div class="filter-container">
+
+        <button
+            class="filter-btn active"
+            data-filter="today">
+
+            Today
+
+        </button>
+
+        <button
+            class="filter-btn"
+            data-filter="yesterday">
+
+            Yesterday
+
+        </button>
+
+        <button
+            class="filter-btn"
+            data-filter="week">
+
+            This Week
+
+        </button>
+
+        <button
+            class="filter-btn"
+            data-filter="month">
+
+            This Month
+
+        </button>
+
+        <button
+            class="filter-btn"
+            data-filter="lastMonth">
+
+            Last Month
+
+        </button>
+
+        <button
+            class="filter-btn"
+            data-filter="custom">
+
+            Custom
+
+        </button>
+
+    </div>
+
+    <!-- ===========================
+         CUSTOM DATE
+    ============================ -->
+
+    <div
+        id="customDateBox"
+        class="custom-date hidden">
+
+        <div class="input-group">
+
+            <label>
+
+                From
+
+            </label>
+
+            <input
+                type="date"
+                id="fromDate">
+
+        </div>
+
+        <div class="input-group">
+
+            <label>
+
+                To
+
+            </label>
+
+            <input
+                type="date"
+                id="toDate">
+
+        </div>
+
+        <button
+            id="showReportBtn">
+
+            Show Report
+
+        </button>
+
+    </div>
+
+    <!-- ===========================
+         EXPENSE LIST
+    ============================ -->
+
+    <div
+        id="expenseList"
+        class="expense-list">
+        <div class="loading-card"></div>
+<div class="loading-card"></div>
+<div class="loading-card"></div>
+
+        <div class="empty-state">
+
+            <i class="fa-solid fa-chart-line"></i>
+
+            <p>
+
+                No Expense Found
+
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ===========================
+     STICKY SUMMARY
+=========================== -->
+
+<div class="summary-bar">
+
+    <div class="summary-card">
+
+        <span>
+
+            Transactions
+
+        </span>
+
+        <h3
+            id="transactionCount">
+
+            0
+
+        </h3>
+
+    </div>
+
+    <div class="summary-card">
+
+        <span>
+
+            Total Amount
+
+        </span>
+
+        <h3
+            id="totalExpense">
+
+            ₹0.00
+
+        </h3>
+
+    </div>
+
+</div>
+
+<script src="api.js"></script>
+
+<script src="analytics.js"></script>
+
+</body>
+
+</html>
