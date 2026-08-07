@@ -2,7 +2,7 @@
    RoomSplit API
 ========================================== */
 
-const API_URL = "http://localhost:8000/api";
+const API_URL = "https://roomsplit-api-fdm0.onrender.com";
 
 /* ==========================================
    COMMON REQUEST
