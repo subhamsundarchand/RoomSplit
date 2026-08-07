@@ -187,6 +187,7 @@ body{
 .recent-expense{
 
     background:var(--glass);
+    margin-top: 32px;
 
     border-radius:20px;
 

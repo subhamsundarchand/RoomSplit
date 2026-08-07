@@ -1183,3 +1183,16 @@
     opacity:.9;
 
 }
+.expense-date{
+
+    display:block;
+
+    margin-top:6px;
+
+    font-size:13px;
+
+    color:#9CA3AF;
+
+    font-weight:500;
+
+}
