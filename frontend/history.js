@@ -143,30 +143,28 @@ async function renderHistory(expenses) {
 
                 <div class="settlement-item">
 
-                    <span>
+    <div class="settlement-left">
 
-                        ${
-    item.status === "Paid"
-        ? "✅"
-        : item.status === "Partial"
-        ? "🟠"
-        : "🟡"
-}
+        ${
+            item.status === "Paid"
+                ? "✅"
+                : item.status === "Partial"
+                ? "🟠"
+                : "🟡"
+        }
 
-                        ${getName(item.from)}
+        ${getName(item.from)}
 
-                        → Pay
+        → Pay
 
-                        ₹${Number(item.remainingAmount).toFixed(2)}
+        ₹${Number(item.remainingAmount).toFixed(2)}
 
-                    </span>
+    </div>
 
-                    ${
-item.status !== "Paid"
+    ${
+        item.status !== "Paid"
+        ? `
 
-?
-
-`
 <div class="settlement-actions">
 
     <button
@@ -188,13 +186,11 @@ item.status !== "Paid"
     </button>
 
 </div>
+
 `
+        : `
 
-
-
-:
-
-`<div class="paid-info">
+<div class="paid-info">
 
     <div class="paid-badge">
 
@@ -210,11 +206,12 @@ item.status !== "Paid"
 
     </small>
 
-</div>`
+</div>
 
-}
+`
+    }
 
-                </div>
+</div>
 
                 `;
 
