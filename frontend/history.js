@@ -257,7 +257,9 @@ item.status !== "Paid"
     </h2>
 
     <small class="expense-date">
-        ${formatExpenseDate(expense.createdAt)}
+        <small class="expense-date">
+    ${formatExpenseDate(expense.createdAt) || ""}
+</small>
     </small>
 
     <div class="actions">
@@ -422,33 +424,40 @@ function formatExpenseDate(createdAt) {
 
     let d;
 
-    if (createdAt._seconds) {
+    if (createdAt.seconds) {
+
+        d = new Date(createdAt.seconds * 1000);
+
+    }
+
+    else if (createdAt._seconds) {
 
         d = new Date(createdAt._seconds * 1000);
 
-    } else {
+    }
+
+    else if (createdAt.toDate) {
+
+        d = createdAt.toDate();
+
+    }
+
+    else {
 
         d = new Date(createdAt);
 
     }
 
+    if (isNaN(d.getTime())) return "";
+
     const now = new Date();
 
-    const today = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate()
-    );
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
     const yesterday = new Date(today);
-
     yesterday.setDate(today.getDate() - 1);
 
-    const expenseDay = new Date(
-        d.getFullYear(),
-        d.getMonth(),
-        d.getDate()
-    );
+    const expenseDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
 
     const time = d.toLocaleTimeString("en-IN", {
         hour: "2-digit",
@@ -456,17 +465,11 @@ function formatExpenseDate(createdAt) {
         hour12: true
     });
 
-    if (expenseDay.getTime() === today.getTime()) {
-
+    if (+expenseDay === +today)
         return `Today • ${time}`;
 
-    }
-
-    if (expenseDay.getTime() === yesterday.getTime()) {
-
+    if (+expenseDay === +yesterday)
         return `Yesterday • ${time}`;
-
-    }
 
     if (d.getFullYear() === now.getFullYear()) {
 
@@ -482,7 +485,6 @@ function formatExpenseDate(createdAt) {
         month: "short",
         year: "numeric"
     })} • ${time}`;
-
 }
 /* ==========================================
    UPI IDS
