@@ -62,7 +62,7 @@ async function apiRequest(endpoint, method = "GET", body = null) {
 async function getExpenses() {
 
     const result =
-        await apiRequest("/expenses");
+        await apiRequest("/api/expenses");
 
     return result.success
 
@@ -80,7 +80,7 @@ async function addExpense(expense) {
 
     return await apiRequest(
 
-        "/expenses",
+        "/api/expenses",
 
         "POST",
 
@@ -98,7 +98,7 @@ async function updateExpense(id, expense) {
 
     return await apiRequest(
 
-        "/expenses/" + id,
+        "/api/expenses/" + id,
 
         "PUT",
 
@@ -115,7 +115,7 @@ async function deleteExpense(id) {
 
     return await apiRequest(
 
-        "/expenses/" + id,
+        "/api/expenses/" + id,
 
         "DELETE"
 
@@ -131,7 +131,7 @@ async function getExpenseById(id) {
 
     return await apiRequest(
 
-        "/expenses/" + id,
+        "/api/expenses/" + id,
 
         "GET"
 
@@ -167,7 +167,7 @@ async function getHistory() {
 
     const start = performance.now();
 
-    const result = await apiRequest("/history");
+    const result = await apiRequest("/api/history");
 
     console.log(
         "API Time:",
@@ -180,7 +180,7 @@ async function getHistory() {
 }
 async function getAnalytics() {
 
-    return await apiRequest("/analytics");
+    return await apiRequest("/api/analytics");
 
 }
 /* ==========================================
@@ -228,7 +228,7 @@ async function apiSaveSettings(settings) {
 
     return await apiRequest(
 
-        "/settings",
+        "/api/settings",
 
         "POST",
 
@@ -251,7 +251,7 @@ async function apiGetSettings() {
 
     return await apiRequest(
 
-        "/settings/" + currentUser,
+        "/api/settings/" + currentUser,
 
         "GET"
 
@@ -265,7 +265,7 @@ async function apiGetSettings() {
 async function getSettlement() {
 
     return await apiRequest(
-        "/settlement"
+        "/api/settlement"
     );
 
 }
@@ -287,7 +287,7 @@ async function paySettlement(
 
     return await apiRequest(
 
-        "/settlement/pay",
+        "/api/settlement/pay",
 
         "POST",
 
@@ -308,18 +308,14 @@ async function paySettlement(
 }
 async function apiGetMembers() {
 
-    const response = await fetch(
-        "http://localhost:8000/api/members"
-    );
-
-    return await response.json();
+    return await apiRequest("/api/members");
 
 }
 async function sendReminder(phone, message) {
 
     return await apiRequest(
 
-        "/whatsapp/send",
+        "/api/whatsapp/send",
 
         "POST",
 

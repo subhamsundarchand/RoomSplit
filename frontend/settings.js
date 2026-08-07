@@ -77,7 +77,7 @@ async function testWhatsApp() {
 
     const result = await fetch(
 
-        "http://localhost:8000/api/whatsapp/send",
+        "https://roomsplit-api-fdm0.onrender.com/api/whatsapp/send",
 
         {
 

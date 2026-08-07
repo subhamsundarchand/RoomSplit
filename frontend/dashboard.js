@@ -40,7 +40,7 @@ async function loadDashboard() {
 
         const result = await getHistory();
 
-        console.log(result);
+        console.log("Dashboard Result:", result);
 
         const expenses = result.data;
 
