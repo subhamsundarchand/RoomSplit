@@ -568,7 +568,7 @@ async function confirmSettlement() {
 console.log("UPI ID:", upiId);
 console.log("UPI LINK:", upiLink);
 
-alert(upiLink);
+
 
         // Mobile
         if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
