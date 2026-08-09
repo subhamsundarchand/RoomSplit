@@ -565,6 +565,10 @@ async function confirmSettlement() {
 
         const upiLink =
 `upi://pay?pa=${upiId}&pn=${getName(receiver)}&am=${settlement.remainingAmount}&tn=RoomSplit Settlement&cu=INR`;
+console.log("RECEIVER:", receiver);
+console.log("UPI ID:", upiId);
+console.log("REMAINING AMOUNT:", settlement.remainingAmount);
+console.log("FINAL UPI LINK:", upiLink);
 
 
 
