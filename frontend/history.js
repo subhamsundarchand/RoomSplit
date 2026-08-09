@@ -563,19 +563,21 @@ async function confirmSettlement() {
         confirmBtn.dataset.step !== "pay"
     ) {
 
-        const params = new URLSearchParams({
+       const amount = Number(settlement.remainingAmount).toFixed(2);
+
+const params = new URLSearchParams({
     pa: upiId,
     pn: getName(receiver),
-    am: Number(settlement.remainingAmount).toFixed(2),
+    am: amount,
     tn: "RoomSplit Settlement",
     cu: "INR"
 });
 
 const upiLink = `upi://pay?${params.toString()}`;
 
-console.log("FINAL UPI LINK:", upiLink);
-
-window.location.href = upiLink;
+console.log("UPI ID:", upiId);
+console.log("Amount:", amount);
+console.log("UPI LINK:", upiLink);
 
 
 
