@@ -583,11 +583,19 @@ console.log("UPI LINK:", upiLink);
 
 
         // Mobile
-        if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+       if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
 
-            window.location.href = upiLink;
+    const a = document.createElement("a");
 
-        }
+    a.href = upiLink;
+
+    document.body.appendChild(a);
+
+    a.click();
+
+    a.remove();
+
+}
 
         // Desktop
         else {
