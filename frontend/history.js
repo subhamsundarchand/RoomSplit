@@ -565,15 +565,15 @@ async function confirmSettlement() {
 
        const amount = Number(settlement.remainingAmount).toFixed(2);
 
-const params = new URLSearchParams({
-    pa: upiId,
-    pn: getName(receiver),
-    am: amount,
-    tn: "RoomSplit Settlement",
-    cu: "INR"
-});
+const upiLink =
+    `upi://pay?pa=${encodeURIComponent(upiId)}` +
+    `&pn=${encodeURIComponent(getName(receiver))}` +
+    `&am=${encodeURIComponent(amount)}` +
+    `&cu=INR`;
 
-const upiLink = `upi://pay?${params.toString()}`;
+console.log("UPI ID:", upiId);
+console.log("Amount:", amount);
+console.log("UPI LINK:", upiLink);
 
 console.log("UPI ID:", upiId);
 console.log("Amount:", amount);
