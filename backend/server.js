@@ -1,7 +1,6 @@
 
 require("dotenv").config();
-console.log(process.env.WHATSAPP_TOKEN);
-console.log(process.env.WHATSAPP_PHONE_NUMBER_ID);
+
 
 const razorpayRoutes = require("./routes/razorpayRoutes");
 const whatsappRoutes =
