@@ -622,8 +622,7 @@ if (
 
         const options = {
 
-            key:
-                "rzp_test_TNxtZEwpn90ltY",
+            key: order.keyId,
 
             amount:
                 order.amount,
