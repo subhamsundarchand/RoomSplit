@@ -567,12 +567,12 @@ if (
         Number(settlement.remainingAmount).toFixed(2);
 
     const upiLink =
-    `upi://pay` +
-    `?pa=${upiId}` +
-    `&pn=${encodeURIComponent(getName(receiver))}` +
-    `&am=${amount}` +
-    `&tn=${encodeURIComponent("RoomSplit Settlement")}` +
-    `&cu=INR`;
+        `upi://pay` +
+        `?pa=${upiId}` +
+        `&pn=${encodeURIComponent(getName(receiver))}` +
+        `&am=${amount}` +
+        `&tn=${encodeURIComponent("RoomSplit Settlement")}` +
+        `&cu=INR`;
 
     console.log("Payment Method:", method);
     console.log("UPI ID:", upiId);
@@ -586,50 +586,18 @@ if (
 
     if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
 
-        /*
-         * Google Pay on iOS has an official gpay://
-         * intent URI. Android uses generic UPI intent.
-         */
+        const upiAppLink =
+            document.createElement("a");
 
-        if (
-            /iPhone|iPad|iPod/i.test(navigator.userAgent) &&
-            method === "Google Pay"
-        ) {
+        upiAppLink.href = upiLink;
 
-            const gpayLink =
-                `gpay://upi/pay` +
-                `?pa=${encodeURIComponent(upiId)}` +
-                `&pn=${encodeURIComponent(getName(receiver))}` +
-                `&am=${encodeURIComponent(amount)}` +
-                `&tn=${encodeURIComponent("RoomSplit Settlement")}` +
-                `&cu=INR`;
+        upiAppLink.style.display = "none";
 
-            window.location.href = gpayLink;
+        document.body.appendChild(upiAppLink);
 
-        }
+        upiAppLink.click();
 
-        else {
-
-            /*
-             * Android:
-             * Generic UPI intent lets the device use
-             * the installed UPI app / chooser.
-             */
-
-            const a =
-                document.createElement("a");
-
-            a.href = upiLink;
-
-            a.style.display = "none";
-
-            document.body.appendChild(a);
-
-            a.click();
-
-            a.remove();
-
-        }
+        upiAppLink.remove();
 
     }
 
@@ -649,10 +617,9 @@ if (
             .getElementById("upiIdText")
             .textContent = upiId;
 
-        const qr =
-            document.getElementById("upiQR");
-
-        qr.src =
+        document
+            .getElementById("upiQR")
+            .src =
             "https://quickchart.io/qr?size=300&margin=2&text=" +
             encodeURIComponent(upiLink);
 
@@ -666,7 +633,6 @@ if (
         "pay";
 
     return;
-
 }
 
     // ==========================
