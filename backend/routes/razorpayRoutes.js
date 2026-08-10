@@ -3,6 +3,7 @@ const crypto = require("crypto");
 const Razorpay = require("razorpay");
 
 const router = express.Router();
+
 router.get("/test", (req, res) => {
     res.json({
         success: true,
@@ -14,7 +15,6 @@ const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
     key_secret: process.env.RAZORPAY_KEY_SECRET
 });
-
 
 // ==========================================
 // CREATE RAZORPAY ORDER
@@ -77,7 +77,20 @@ router.post("/create-order", async (req, res) => {
 
             });
 
-        urrency: order.currency
+        // SEND ORDER DETAILS TO FRONTEND
+        res.json({
+
+            success: true,
+
+            orderId: order.id,
+
+            amount: order.amount,
+
+            currency: order.currency,
+
+            keyId: process.env.RAZORPAY_KEY_ID
+
+        });
 
     }
 
@@ -102,7 +115,6 @@ router.post("/create-order", async (req, res) => {
     }
 
 });
-
 
 // ==========================================
 // VERIFY RAZORPAY PAYMENT
@@ -207,12 +219,4 @@ router.post("/verify", async (req, res) => {
 
 });
 
-
 module.exports = router;
-res.json({
-    success: true,
-    orderId: order.id,
-    amount: order.amount,
-    currency: order.currency,
-    keyId: process.env.RAZORPAY_KEY_ID
-});
