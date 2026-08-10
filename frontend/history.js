@@ -578,7 +578,7 @@ if (
         // --------------------------
 
         const response = await fetch(
-            `${API_BASE_URL}/api/razorpay/create-order`,
+            `${API_URL}/api/razorpay/create-order`,
             {
                 method: "POST",
 
@@ -623,7 +623,7 @@ if (
         const options = {
 
             key:
-                "rzp_test_TNxtZEwpn90ltY",
+                "rzp_test_TNxregthhY",
 
             amount:
                 order.amount,
@@ -672,7 +672,7 @@ if (
 
                         const verifyResponse =
                             await fetch(
-                                `${API_BASE_URL}/api/razorpay/verify`,
+                                `${API_URL}/api/razorpay/verify`,
                                 {
 
                                     method:
