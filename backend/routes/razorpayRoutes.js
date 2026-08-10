@@ -3,6 +3,12 @@ const crypto = require("crypto");
 const Razorpay = require("razorpay");
 
 const router = express.Router();
+router.get("/test", (req, res) => {
+    res.json({
+        success: true,
+        message: "Razorpay route is working"
+    });
+});
 
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
