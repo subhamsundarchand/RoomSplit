@@ -3,6 +3,7 @@ require("dotenv").config();
 console.log(process.env.WHATSAPP_TOKEN);
 console.log(process.env.WHATSAPP_PHONE_NUMBER_ID);
 
+const razorpayRoutes = require("./routes/razorpayRoutes");
 const whatsappRoutes =
 require("./routes/whatsappRoutes");
 const settlementRoutes =
@@ -82,6 +83,10 @@ app.use(
 app.use(
     "/api/whatsapp",
     whatsappRoutes
+);
+app.use(
+    "/api/razorpay",
+    razorpayRoutes
 );
 app.get("/", async (req, res) => {
 

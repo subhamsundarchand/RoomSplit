@@ -555,7 +555,7 @@ async function confirmSettlement() {
     const upiId = UPI_IDS[receiver];
 
 // ==========================
-// STEP 1 : OPEN PAYMENT
+// STEP 1 : RAZORPAY PAYMENT
 // ==========================
 
 if (
@@ -566,71 +566,298 @@ if (
     const amount =
         Number(settlement.remainingAmount).toFixed(2);
 
-    const upiLink =
-        `upi://pay` +
-        `?pa=${upiId}` +
-        `&pn=${encodeURIComponent(getName(receiver))}` +
-        `&am=${amount}` +
-        `&tn=${encodeURIComponent("RoomSplit Settlement")}` +
-        `&cu=INR`;
+    try {
 
-    console.log("Payment Method:", method);
-    console.log("UPI ID:", upiId);
-    console.log("Amount:", amount);
-    console.log("UPI LINK:", upiLink);
+        confirmBtn.disabled = true;
+
+        confirmBtn.innerHTML =
+            "⏳ Opening Payment...";
+
+        // --------------------------
+        // CREATE RAZORPAY ORDER
+        // --------------------------
+
+        const response = await fetch(
+            `${API_BASE_URL}/api/razorpay/create-order`,
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    expenseId:
+                        expense.id,
+
+                    settlementId:
+                        settlement.id,
+
+                    amount:
+                        amount
+
+                })
+
+            }
+        );
+
+        const order =
+            await response.json();
+
+        if (!order.success) {
+
+            throw new Error(
+                order.message ||
+                "Unable to create payment order"
+            );
+
+        }
 
 
-    // ==========================
-    // MOBILE
-    // ==========================
+        // --------------------------
+        // OPEN RAZORPAY CHECKOUT
+        // --------------------------
 
-    if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+        const options = {
 
-        const upiAppLink =
-            document.createElement("a");
+            key:
+                "rzp_test_TNxtZEwpn90ltY",
 
-        upiAppLink.href = upiLink;
+            amount:
+                order.amount,
 
-        upiAppLink.style.display = "none";
+            currency:
+                order.currency,
 
-        document.body.appendChild(upiAppLink);
+            name:
+                "RoomSplit",
 
-        upiAppLink.click();
+            description:
+                `Settlement - ${expense.title}`,
 
-        upiAppLink.remove();
+            order_id:
+                order.orderId,
+
+            prefill: {
+
+                name:
+                    getName(
+                        localStorage.getItem(
+                            "currentUser"
+                        )
+                    )
+
+            },
+
+            theme: {
+
+                color:
+                    "#6366f1"
+
+            },
+
+
+            handler:
+                async function (
+                    razorpayResponse
+                ) {
+
+                    try {
+
+                        // --------------------------
+                        // VERIFY PAYMENT
+                        // --------------------------
+
+                        const verifyResponse =
+                            await fetch(
+                                `${API_BASE_URL}/api/razorpay/verify`,
+                                {
+
+                                    method:
+                                        "POST",
+
+                                    headers: {
+
+                                        "Content-Type":
+                                            "application/json"
+
+                                    },
+
+                                    body:
+                                        JSON.stringify({
+
+                                            razorpay_order_id:
+                                                razorpayResponse.razorpay_order_id,
+
+                                            razorpay_payment_id:
+                                                razorpayResponse.razorpay_payment_id,
+
+                                            razorpay_signature:
+                                                razorpayResponse.razorpay_signature
+
+                                        })
+
+                                }
+                            );
+
+                        const verification =
+                            await verifyResponse.json();
+
+
+                        if (
+                            !verification.success
+                        ) {
+
+                            throw new Error(
+                                verification.message ||
+                                "Payment verification failed"
+                            );
+
+                        }
+
+
+                        // --------------------------
+                        // SAVE SETTLEMENT
+                        // --------------------------
+
+                        const result =
+                            await paySettlement(
+
+                                expense.id,
+
+                                settlement.id,
+
+                                settlement.remainingAmount,
+
+                                "Razorpay UPI"
+
+                            );
+
+
+                        if (!result.success) {
+
+                            throw new Error(
+                                result.message ||
+                                "Settlement update failed"
+                            );
+
+                        }
+
+
+                        sessionStorage.removeItem(
+                            "dashboard"
+                        );
+
+                        sessionStorage.removeItem(
+                            "history"
+                        );
+
+                        sessionStorage.removeItem(
+                            "settlements"
+                        );
+
+
+                        await loadHistory();
+
+                        closeSettlementModal();
+
+
+                        showToast(
+                            "Payment successful ✅",
+                            "success"
+                        );
+
+                    }
+
+                    catch (error) {
+
+                        console.error(
+                            "Payment processing error:",
+                            error
+                        );
+
+                        showToast(
+                            error.message ||
+                            "Payment verification failed ❌",
+                            "error"
+                        );
+
+                    }
+
+                },
+
+
+            modal: {
+
+                ondismiss:
+                    function () {
+
+                        confirmBtn.disabled =
+                            false;
+
+                        confirmBtn.innerHTML =
+                            "Continue →";
+
+                    }
+
+            }
+
+        };
+
+
+        const razorpay =
+            new Razorpay(options);
+
+
+        razorpay.on(
+            "payment.failed",
+            function (response) {
+
+                console.error(
+                    "Razorpay Payment Failed:",
+                    response.error
+                );
+
+                showToast(
+                    response.error.description ||
+                    "Payment failed ❌",
+                    "error"
+                );
+
+            }
+        );
+
+
+        razorpay.open();
+
 
     }
 
+    catch (error) {
 
-    // ==========================
-    // DESKTOP
-    // ==========================
+        console.error(
+            "Razorpay Error:",
+            error
+        );
 
-    else {
-
-        document
-            .getElementById("qrPayment")
-            .classList
-            .remove("hidden");
-
-        document
-            .getElementById("upiIdText")
-            .textContent = upiId;
-
-        document
-            .getElementById("upiQR")
-            .src =
-            "https://quickchart.io/qr?size=300&margin=2&text=" +
-            encodeURIComponent(upiLink);
+        showToast(
+            error.message ||
+            "Unable to start payment ❌",
+            "error"
+        );
 
     }
 
+    finally {
 
-    confirmBtn.innerHTML =
-        "Confirm Payment";
+        confirmBtn.disabled = false;
 
-    confirmBtn.dataset.step =
-        "pay";
+        confirmBtn.innerHTML =
+            "Continue →";
+
+    }
 
     return;
 }
