@@ -77,17 +77,7 @@ router.post("/create-order", async (req, res) => {
 
             });
 
-        res.json({
-
-            success: true,
-
-            orderId: order.id,
-
-            amount: order.amount,
-
-            currency: order.currency
-
-        });
+        urrency: order.currency
 
     }
 
