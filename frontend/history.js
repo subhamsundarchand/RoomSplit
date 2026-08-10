@@ -554,88 +554,120 @@ async function confirmSettlement() {
 
     const upiId = UPI_IDS[receiver];
 
+// ==========================
+// STEP 1 : OPEN PAYMENT
+// ==========================
+
+if (
+    method !== "Cash" &&
+    confirmBtn.dataset.step !== "pay"
+) {
+
+    const amount =
+        Number(settlement.remainingAmount).toFixed(2);
+
+    const upiLink =
+        `upi://pay` +
+        `?pa=${encodeURIComponent(upiId)}` +
+        `&pn=${encodeURIComponent(getName(receiver))}` +
+        `&am=${encodeURIComponent(amount)}` +
+        `&tn=${encodeURIComponent("RoomSplit Settlement")}` +
+        `&cu=INR`;
+
+    console.log("Payment Method:", method);
+    console.log("UPI ID:", upiId);
+    console.log("Amount:", amount);
+    console.log("UPI LINK:", upiLink);
+
+
     // ==========================
-    // STEP 1 : OPEN PAYMENT
+    // MOBILE
     // ==========================
 
-    if (
-        method !== "Cash" &&
-        confirmBtn.dataset.step !== "pay"
-    ) {
+    if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
 
-       const amount = Number(settlement.remainingAmount).toFixed(2);
+        /*
+         * Google Pay on iOS has an official gpay://
+         * intent URI. Android uses generic UPI intent.
+         */
 
-const upiLink =
-    `upi://pay?pa=${encodeURIComponent(upiId)}` +
-    `&pn=${encodeURIComponent(getName(receiver))}` +
-    `&am=${encodeURIComponent(amount)}` +
-    `&cu=INR`;
+        if (
+            /iPhone|iPad|iPod/i.test(navigator.userAgent) &&
+            method === "Google Pay"
+        ) {
 
-console.log("UPI ID:", upiId);
-console.log("Amount:", amount);
-console.log("UPI LINK:", upiLink);
+            const gpayLink =
+                `gpay://upi/pay` +
+                `?pa=${encodeURIComponent(upiId)}` +
+                `&pn=${encodeURIComponent(getName(receiver))}` +
+                `&am=${encodeURIComponent(amount)}` +
+                `&tn=${encodeURIComponent("RoomSplit Settlement")}` +
+                `&cu=INR`;
 
-console.log("UPI ID:", upiId);
-console.log("Amount:", amount);
-console.log("UPI LINK:", upiLink);
-
-
-
-
-        // Mobile
-       if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-
-    const a = document.createElement("a");
-
-    a.href = upiLink;
-
-    document.body.appendChild(a);
-
-    a.click();
-
-    a.remove();
-
-}
-
-        // Desktop
-        else {
-
-            document
-                .getElementById("desktopPayment")
-                .classList
-                .remove("hidden");
-
-            document
-                .getElementById("upiIdText")
-                .textContent = upiId;
-
-            const qr = document.getElementById("upiQR");
-
-qr.onload = () => {
-
-    console.log("QR Loaded ✅");
-
-};
-
-qr.onerror = () => {
-
-    console.log("QR Failed ❌");
-
-};
-
-qr.src =
-    "https://quickchart.io/qr?size=300&margin=2&text=" +
-    encodeURIComponent(upiLink);
+            window.location.href = gpayLink;
 
         }
 
-        confirmBtn.innerHTML = "Confirm Payment";
+        else {
 
-        confirmBtn.dataset.step = "pay";
+            /*
+             * Android:
+             * Generic UPI intent lets the device use
+             * the installed UPI app / chooser.
+             */
 
-        return;
+            const a =
+                document.createElement("a");
+
+            a.href = upiLink;
+
+            a.style.display = "none";
+
+            document.body.appendChild(a);
+
+            a.click();
+
+            a.remove();
+
+        }
 
     }
+
+
+    // ==========================
+    // DESKTOP
+    // ==========================
+
+    else {
+
+        document
+            .getElementById("qrPayment")
+            .classList
+            .remove("hidden");
+
+        document
+            .getElementById("upiIdText")
+            .textContent = upiId;
+
+        const qr =
+            document.getElementById("upiQR");
+
+        qr.src =
+            "https://quickchart.io/qr?size=300&margin=2&text=" +
+            encodeURIComponent(upiLink);
+
+    }
+
+
+    confirmBtn.innerHTML =
+        "Confirm Payment";
+
+    confirmBtn.dataset.step =
+        "pay";
+
+    return;
+
+}
 
     // ==========================
     // STEP 2 : SAVE PAYMENT
@@ -696,7 +728,7 @@ function closeSettlementModal() {
         .add("hidden");
 
     document
-        .getElementById("desktopPayment")
+        .getElementById("qrPayment")
         .classList
         .add("hidden");
 
@@ -715,7 +747,7 @@ function closeSettlementModal() {
     .dataset.step = "";
 
 document
-    .getElementById("desktopPayment")
+    .getElementById("qrPayment")
     .classList
     .add("hidden");
 
