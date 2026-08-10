@@ -623,7 +623,7 @@ if (
         const options = {
 
             key:
-                "rzp_test_TNxregthhY",
+                "rzp_test_TNxtZEwpn90ltY",
 
             amount:
                 order.amount,
