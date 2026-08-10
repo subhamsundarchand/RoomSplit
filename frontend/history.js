@@ -567,12 +567,12 @@ if (
         Number(settlement.remainingAmount).toFixed(2);
 
     const upiLink =
-        `upi://pay` +
-        `?pa=${encodeURIComponent(upiId)}` +
-        `&pn=${encodeURIComponent(getName(receiver))}` +
-        `&am=${encodeURIComponent(amount)}` +
-        `&tn=${encodeURIComponent("RoomSplit Settlement")}` +
-        `&cu=INR`;
+    `upi://pay` +
+    `?pa=${upiId}` +
+    `&pn=${encodeURIComponent(getName(receiver))}` +
+    `&am=${amount}` +
+    `&tn=${encodeURIComponent("RoomSplit Settlement")}` +
+    `&cu=INR`;
 
     console.log("Payment Method:", method);
     console.log("UPI ID:", upiId);
