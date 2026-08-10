@@ -219,3 +219,10 @@ router.post("/verify", async (req, res) => {
 
 
 module.exports = router;
+res.json({
+    success: true,
+    orderId: order.id,
+    amount: order.amount,
+    currency: order.currency,
+    keyId: process.env.RAZORPAY_KEY_ID
+});
