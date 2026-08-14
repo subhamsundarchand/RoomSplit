@@ -512,16 +512,7 @@ function openSettlement(btn, id) {
 
 document.getElementById("upiIdText").textContent =
     upiId || "UPI ID not available";
-
-    document
-        .querySelectorAll(".payment-card")
-        .forEach(card => card.classList.remove("active"));
-
-    document
-        .querySelector(".payment-card[data-method='Cash']")
-        .classList.add("active");
-
-    document.getElementById("paymentMethod").value = "Cash";
+document.getElementById("paymentMethod").value = "UPI";
     document
     .getElementById("desktopPayment")
     .classList
