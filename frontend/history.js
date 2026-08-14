@@ -508,6 +508,10 @@ function openSettlement(btn, id) {
             getName(expense.paidBy);
 
     }
+    const upiId = UPI_IDS[expense.paidBy];
+
+document.getElementById("upiIdText").textContent =
+    upiId || "UPI ID not available";
 
     document
         .querySelectorAll(".payment-card")
@@ -518,6 +522,10 @@ function openSettlement(btn, id) {
         .classList.add("active");
 
     document.getElementById("paymentMethod").value = "Cash";
+    document
+    .getElementById("desktopPayment")
+    .classList
+    .remove("hidden");
 
     document
         .getElementById("settlementModal")
@@ -554,316 +562,93 @@ async function confirmSettlement() {
 
     const upiId = UPI_IDS[receiver];
 
-// ==========================
-// STEP 1 : RAZORPAY PAYMENT
-// ==========================
+    // ==========================================
+    // UPI PAYMENT
+    // ==========================================
 
-if (
-    method !== "Cash" &&
-    confirmBtn.dataset.step !== "pay"
-) {
+    if (method !== "Cash") {
 
-    const amount =
-        Number(settlement.remainingAmount).toFixed(2);
+        if (!upiId) {
 
-    try {
-
-        confirmBtn.disabled = true;
-
-        confirmBtn.innerHTML =
-            "⏳ Opening Payment...";
-
-        // --------------------------
-        // CREATE RAZORPAY ORDER
-        // --------------------------
-
-        const response = await fetch(
-            `${API_URL}/api/razorpay/create-order`,
-            {
-                method: "POST",
-
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
-
-                body: JSON.stringify({
-
-                    expenseId:
-                        expense.id,
-
-                    settlementId:
-                        settlement.id,
-
-                    amount:
-                        amount
-
-                })
-
-            }
-        );
-
-        const order =
-            await response.json();
-
-        if (!order.success) {
-
-            throw new Error(
-                order.message ||
-                "Unable to create payment order"
+            showToast(
+                "UPI ID not configured for receiver",
+                "error"
             );
+
+            return;
+        }
+
+        const amount =
+            Number(settlement.remainingAmount).toFixed(2);
+
+        const upiUrl =
+            `upi://pay?pa=${encodeURIComponent(upiId)}` +
+            `&pn=${encodeURIComponent(getName(receiver))}` +
+            `&am=${amount}` +
+            `&cu=INR` +
+            `&tn=${encodeURIComponent(
+                `RoomSplit - ${expense.title}`
+            )}`;
+
+        try {
+
+            confirmBtn.disabled = true;
+
+            confirmBtn.innerHTML =
+                "⏳ Opening UPI...";
+
+            /*
+             * Open GPay / PhonePe / Paytm
+             * on supported mobile devices.
+             */
+            window.location.href = upiUrl;
+
+            /*
+             * IMPORTANT:
+             * We DO NOT mark the settlement Paid here.
+             *
+             * Payment must be confirmed separately.
+             */
+
+            setTimeout(() => {
+
+                confirmBtn.disabled = false;
+
+                confirmBtn.innerHTML =
+                    "I've Paid";
+
+                confirmBtn.dataset.step =
+                    "upi-pending";
+
+            }, 1500);
 
         }
 
+        catch (error) {
 
-        // --------------------------
-        // OPEN RAZORPAY CHECKOUT
-        // --------------------------
+            console.error(
+                "UPI Error:",
+                error
+            );
 
-        const options = {
+            showToast(
+                "Unable to open UPI app ❌",
+                "error"
+            );
 
-            key: order.keyId,
+            confirmBtn.disabled = false;
 
-            amount:
-                order.amount,
+            confirmBtn.innerHTML =
+                "Continue →";
 
-            currency:
-                order.currency,
+        }
 
-            name:
-                "RoomSplit",
-
-            description:
-                `Settlement - ${expense.title}`,
-
-            order_id:
-                order.orderId,
-
-            prefill: {
-
-                name:
-                    getName(
-                        localStorage.getItem(
-                            "currentUser"
-                        )
-                    )
-
-            },
-
-            theme: {
-
-                color:
-                    "#6366f1"
-
-            },
-
-
-            handler:
-                async function (
-                    razorpayResponse
-                ) {
-
-                    try {
-
-                        // --------------------------
-                        // VERIFY PAYMENT
-                        // --------------------------
-
-                        const verifyResponse =
-                            await fetch(
-                                `${API_URL}/api/razorpay/verify`,
-                                {
-
-                                    method:
-                                        "POST",
-
-                                    headers: {
-
-                                        "Content-Type":
-                                            "application/json"
-
-                                    },
-
-                                    body:
-                                        JSON.stringify({
-
-                                            razorpay_order_id:
-                                                razorpayResponse.razorpay_order_id,
-
-                                            razorpay_payment_id:
-                                                razorpayResponse.razorpay_payment_id,
-
-                                            razorpay_signature:
-                                                razorpayResponse.razorpay_signature
-
-                                        })
-
-                                }
-                            );
-
-                        const verification =
-                            await verifyResponse.json();
-
-
-                        if (
-                            !verification.success
-                        ) {
-
-                            throw new Error(
-                                verification.message ||
-                                "Payment verification failed"
-                            );
-
-                        }
-
-
-                        // --------------------------
-                        // SAVE SETTLEMENT
-                        // --------------------------
-
-                        const result =
-                            await paySettlement(
-
-                                expense.id,
-
-                                settlement.id,
-
-                                settlement.remainingAmount,
-
-                                "Razorpay UPI"
-
-                            );
-
-
-                        if (!result.success) {
-
-                            throw new Error(
-                                result.message ||
-                                "Settlement update failed"
-                            );
-
-                        }
-
-
-                        sessionStorage.removeItem(
-                            "dashboard"
-                        );
-
-                        sessionStorage.removeItem(
-                            "history"
-                        );
-
-                        sessionStorage.removeItem(
-                            "settlements"
-                        );
-
-
-                        await loadHistory();
-
-                        closeSettlementModal();
-
-
-                        showToast(
-                            "Payment successful ✅",
-                            "success"
-                        );
-
-                    }
-
-                    catch (error) {
-
-                        console.error(
-                            "Payment processing error:",
-                            error
-                        );
-
-                        showToast(
-                            error.message ||
-                            "Payment verification failed ❌",
-                            "error"
-                        );
-
-                    }
-
-                },
-
-
-            modal: {
-
-                ondismiss:
-                    function () {
-
-                        confirmBtn.disabled =
-                            false;
-
-                        confirmBtn.innerHTML =
-                            "Continue →";
-
-                    }
-
-            }
-
-        };
-
-
-        const razorpay =
-            new Razorpay(options);
-
-
-        razorpay.on(
-            "payment.failed",
-            function (response) {
-
-                console.error(
-                    "Razorpay Payment Failed:",
-                    response.error
-                );
-
-                showToast(
-                    response.error.description ||
-                    "Payment failed ❌",
-                    "error"
-                );
-
-            }
-        );
-
-
-        razorpay.open();
-
-
+        return;
     }
 
-    catch (error) {
-
-        console.error(
-            "Razorpay Error:",
-            error
-        );
-
-        showToast(
-            error.message ||
-            "Unable to start payment ❌",
-            "error"
-        );
-
-    }
-
-    finally {
-
-        confirmBtn.disabled = false;
-
-        confirmBtn.innerHTML =
-            "Continue →";
-
-    }
-
-    return;
-}
-
-    // ==========================
-    // STEP 2 : SAVE PAYMENT
-    // ==========================
+    // ==========================================
+    // CASH PAYMENT
+    // ==========================================
 
     confirmBtn.disabled = true;
 
@@ -879,7 +664,7 @@ if (
 
             settlement.remainingAmount,
 
-            method
+            "Cash"
 
         );
 
@@ -893,19 +678,27 @@ if (
 
         closeSettlementModal();
 
+        showToast(
+            "Cash payment recorded ✅",
+            "success"
+        );
+
     }
 
     else {
 
-        alert(result.message);
+        showToast(
+            result.message ||
+            "Unable to save payment",
+            "error"
+        );
 
     }
 
     confirmBtn.disabled = false;
 
-    confirmBtn.innerHTML = "Confirm";
-
-    confirmBtn.dataset.step = "";
+    confirmBtn.innerHTML =
+        "Continue →";
 
 }
 /* ==========================================
