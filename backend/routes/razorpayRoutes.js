@@ -220,3 +220,73 @@ router.post("/verify", async (req, res) => {
 });
 
 module.exports = router;
+
+router.post("/create-upi-payment", async (req, res) => {
+
+    try {
+
+        const {
+            amount,
+            settlementId
+        } = req.body;
+
+        const payAmount = Number(amount);
+
+        if (
+            !Number.isFinite(payAmount) ||
+            payAmount <= 0 ||
+            !settlementId
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid payment details"
+            });
+        }
+
+        const upiId =
+            process.env.ROOMSPLIT_UPI_ID;
+
+        const payeeName =
+            process.env.ROOMSPLIT_PAYEE_NAME ||
+            "RoomSplit";
+
+        if (!upiId) {
+            return res.status(500).json({
+                success: false,
+                message: "UPI ID is not configured"
+            });
+        }
+
+        const upiUrl =
+            `upi://pay?pa=${encodeURIComponent(upiId)}` +
+            `&pn=${encodeURIComponent(payeeName)}` +
+            `&am=${payAmount.toFixed(2)}` +
+            `&cu=INR` +
+            `&tn=${encodeURIComponent(
+                `RoomSplit Settlement ${settlementId}`
+            )}`;
+
+        res.json({
+            success: true,
+            upiUrl,
+            amount: payAmount,
+            settlementId
+        });
+
+    }
+
+    catch (err) {
+
+        console.error(
+            "UPI Payment Error:",
+            err
+        );
+
+        res.status(500).json({
+            success: false,
+            message: "Unable to create UPI payment"
+        });
+
+    }
+
+});
