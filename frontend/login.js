@@ -11,10 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (loginForm) {
 
         // Already logged in
-        if (currentUser) {
-            window.location.replace("dashboard.html");
-            return;
-        }
+        
 
         loginForm.addEventListener("submit", loginUser);
     }
