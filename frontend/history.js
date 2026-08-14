@@ -123,7 +123,7 @@ async function renderHistory(expenses) {
 
     }
 
-    for (const expense of expenses.slice().reverse()) {
+    for (const expense of expenses) {
 
         const settlements = expense.settlements || [];
 
@@ -487,32 +487,106 @@ let currentSettlementId = null;
 let currentSettlementButton = null;
 
 function openSettlement(btn, id) {
+
     console.log("Clicked Settlement:", id);
 
     currentSettlementId = id;
-
     currentSettlementButton = btn;
 
     const expense = allExpenses.find(exp =>
         exp.settlements?.some(s => s.id === id)
     );
 
-    if (expense) {
-
-        const settlement = expense.settlements.find(s => s.id === id);
-
-        document.getElementById("paymentAmount").textContent =
-    `₹${Number(settlement.remainingAmount).toFixed(2)}`;
-
-        document.getElementById("paymentReceiver").textContent =
-            getName(expense.paidBy);
-
+    if (!expense) {
+        console.error("Expense not found:", id);
+        return;
     }
+
+    const settlement = expense.settlements.find(
+        s => s.id === id
+    );
+
+    if (!settlement) {
+        console.error("Settlement not found:", id);
+        return;
+    }
+
+    // ==========================
+    // PAYMENT INFO
+    // ==========================
+
+    document.getElementById("paymentAmount").textContent =
+        `₹${Number(settlement.remainingAmount).toFixed(2)}`;
+
+    document.getElementById("paymentReceiver").textContent =
+        getName(expense.paidBy);
+
+    // ==========================
+    // UPI ID
+    // ==========================
+
     const upiId = UPI_IDS[expense.paidBy];
 
-document.getElementById("upiIdText").textContent =
-    upiId || "UPI ID not available";
-document.getElementById("paymentMethod").value = "UPI";
+    document.getElementById("upiIdText").textContent =
+        upiId || "UPI ID not available";
+
+    // ==========================
+    // IMPORTANT: DEFAULT = CASH
+    // ==========================
+
+    document.getElementById("paymentMethod").value = "Cash";
+
+    // Cash card active
+    document
+        .querySelectorAll(".payment-card")
+        .forEach(card => {
+
+            card.classList.remove("active");
+
+        });
+
+    const cashCard =
+        document.querySelector(
+            ".payment-card[data-method='Cash']"
+        );
+
+    if (cashCard) {
+        cashCard.classList.add("active");
+    }
+
+    // ==========================
+    // HIDE QR EVERY TIME
+    // ==========================
+
+    document
+        .getElementById("qrPayment")
+        .classList
+        .add("hidden");
+
+    const qrContainer =
+        document.getElementById("upiQrCode");
+
+    if (qrContainer) {
+        qrContainer.innerHTML = "";
+    }
+
+    // ==========================
+    // RESET BUTTON
+    // ==========================
+
+    const confirmBtn =
+        document.getElementById("confirmSettlementBtn");
+
+    confirmBtn.disabled = false;
+
+    confirmBtn.innerHTML =
+        "Continue →";
+
+    confirmBtn.dataset.step = "";
+
+    // ==========================
+    // OPEN MODAL
+    // ==========================
 
     document
         .getElementById("settlementModal")
@@ -553,7 +627,7 @@ async function confirmSettlement() {
     // UPI PAYMENT
     // ==========================================
 
-    if (method !== "Cash") {
+    if (method === "UPI") {
 
         if (!upiId) {
 
@@ -572,10 +646,7 @@ async function confirmSettlement() {
             `upi://pay?pa=${encodeURIComponent(upiId)}` +
             `&pn=${encodeURIComponent(getName(receiver))}` +
             `&am=${amount}` +
-            `&cu=INR` +
-            `&tn=${encodeURIComponent(
-                `RoomSplit - ${expense.title}`
-            )}`;
+            `&cu=INR`;
 
         try {
 
@@ -584,25 +655,37 @@ async function confirmSettlement() {
             confirmBtn.innerHTML =
                 "⏳ Opening UPI...";
 
-            /*
-             * Open GPay / PhonePe / Paytm
-             * on supported mobile devices.
-             */
-            window.location.href = upiUrl;
+            const isMobile =
+                /Android|iPhone|iPad|iPod/i.test(
+                    navigator.userAgent
+                );
 
-            /*
-             * IMPORTANT:
-             * We DO NOT mark the settlement Paid here.
-             *
-             * Payment must be confirmed separately.
-             */
+            if (isMobile) {
+
+                window.location.href = upiUrl;
+
+            } else {
+
+                const qrPayment =
+                    document.getElementById("qrPayment");
+
+                const qrImage =
+                    document.getElementById("upiQR");
+
+                qrPayment.classList.remove("hidden");
+
+                qrImage.src =
+                    "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" +
+                    encodeURIComponent(upiUrl);
+
+            }
 
             setTimeout(() => {
 
                 confirmBtn.disabled = false;
 
                 confirmBtn.innerHTML =
-                    "I've Paid";
+                    "Pay";
 
                 confirmBtn.dataset.step =
                     "upi-pending";
@@ -670,9 +753,7 @@ async function confirmSettlement() {
             "success"
         );
 
-    }
-
-    else {
+    } else {
 
         showToast(
             result.message ||
