@@ -513,10 +513,6 @@ function openSettlement(btn, id) {
 document.getElementById("upiIdText").textContent =
     upiId || "UPI ID not available";
 document.getElementById("paymentMethod").value = "UPI";
-    document
-    .getElementById("desktopPayment")
-    .classList
-    .remove("hidden");
 
     document
         .getElementById("settlementModal")
