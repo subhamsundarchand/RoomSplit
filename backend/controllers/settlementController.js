@@ -12,14 +12,13 @@ exports.getSettlement = async (req, res) => {
             .collection("expenses")
             .get();
 
-        /*
-         * net[user] = user ko kitna dena/ lena hai
-         *
-         * Positive  = user ko paisa milna hai
-         * Negative  = user ko paisa dena hai
-         */
+        const balances = {
+            subham: 0,
+            subhankar: 0,
+            soumya: 0
+        };
 
-        const net = {};
+        const settlementMap = {};
 
         snapshot.forEach(doc => {
 
@@ -30,13 +29,6 @@ exports.getSettlement = async (req, res) => {
 
             settlements.forEach(settlement => {
 
-                /*
-                 * Sirf unpaid amount consider karo.
-                 *
-                 * Paid settlement dobara calculation
-                 * mein nahi aayega.
-                 */
-
                 const remaining =
                     Number(settlement.remainingAmount || 0);
 
@@ -45,139 +37,77 @@ exports.getSettlement = async (req, res) => {
                 const from = settlement.from;
                 const to = settlement.to;
 
-                if (!net[from]) {
-                    net[from] = 0;
+                /*
+                 * Balance calculation
+                 */
+
+                if (!balances[from]) {
+                    balances[from] = 0;
                 }
 
-                if (!net[to]) {
-                    net[to] = 0;
+                if (!balances[to]) {
+                    balances[to] = 0;
                 }
 
-                // from ko paisa dena hai
-                net[from] -= remaining;
+                balances[from] -= remaining;
+                balances[to] += remaining;
 
-                // to ko paisa milna hai
-                net[to] += remaining;
+
+                /*
+                 * Same person -> same person
+                 * settlements ko combine karo
+                 */
+
+                const key = `${from}_${to}`;
+
+                if (!settlementMap[key]) {
+
+                    settlementMap[key] = {
+                        from,
+                        to,
+                        amount: 0
+                    };
+
+                }
+
+                settlementMap[key].amount += remaining;
 
             });
 
         });
 
 
-        /* ==========================================
-           BALANCES
-        ========================================== */
+        /*
+         * Convert map to array
+         */
 
-        const balances = {
+        const settlements =
+            Object.values(settlementMap).map(item => ({
 
-            subham: Number(
-                (net.subham || 0).toFixed(2)
-            ),
+                from: item.from,
 
-            subhankar: Number(
-                (net.subhankar || 0).toFixed(2)
-            ),
-
-            soumya: Number(
-                (net.soumya || 0).toFixed(2)
-            )
-
-        };
-
-
-        /* ==========================================
-           CREATE DEBTORS / CREDITORS
-        ========================================== */
-
-        const creditors = [];
-        const debtors = [];
-
-        Object.keys(net).forEach(user => {
-
-            const amount =
-                Number(net[user].toFixed(2));
-
-            if (amount > 0.01) {
-
-                creditors.push({
-                    user,
-                    amount
-                });
-
-            }
-
-            else if (amount < -0.01) {
-
-                debtors.push({
-                    user,
-                    amount: Math.abs(amount)
-                });
-
-            }
-
-        });
-
-
-        /* ==========================================
-           MINIMUM TRANSACTIONS
-        ========================================== */
-
-        const settlements = [];
-
-        while (
-            creditors.length &&
-            debtors.length
-        ) {
-
-            const creditor = creditors[0];
-            const debtor = debtors[0];
-
-            const pay = Math.min(
-                creditor.amount,
-                debtor.amount
-            );
-
-            settlements.push({
-
-                from: debtor.user,
-
-                to: creditor.user,
+                to: item.to,
 
                 amount: Number(
-                    pay.toFixed(2)
+                    item.amount.toFixed(2)
                 )
 
-            });
+            }));
 
-            creditor.amount =
+
+        /*
+         * Final balances
+         */
+
+        Object.keys(balances).forEach(user => {
+
+            balances[user] =
                 Number(
-                    (creditor.amount - pay).toFixed(2)
+                    balances[user].toFixed(2)
                 );
 
-            debtor.amount =
-                Number(
-                    (debtor.amount - pay).toFixed(2)
-                );
+        });
 
-
-            if (creditor.amount <= 0.01) {
-
-                creditors.shift();
-
-            }
-
-            if (debtor.amount <= 0.01) {
-
-                debtors.shift();
-
-            }
-
-        }
-
-
-        /* ==========================================
-           RESPONSE
-        ========================================== */
 
         res.json({
 
@@ -209,7 +139,6 @@ exports.getSettlement = async (req, res) => {
     }
 
 };
-
 
 /* ==========================================
    MARK SETTLEMENT PAID
