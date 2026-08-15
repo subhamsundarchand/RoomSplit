@@ -69,49 +69,106 @@ function renderRecentExpenses(expenses) {
     const list =
         document.getElementById("recentExpenseList");
 
-    const recent = expenses.slice(-5).reverse();
+    if (!expenses || expenses.length === 0) {
 
-let html = "";
+        list.innerHTML = `
 
-recent.forEach(expense => {
+            <div class="empty-state">
 
-    html += `
+                <i class="fa-solid fa-receipt"></i>
 
-        <div class="expense-item">
+                <p>
+                    No expenses added yet.
+                </p>
 
-            <div>
+            </div>
 
-                <div class="expense-title">
-                    ${expense.title}
+        `;
+
+        return;
+
+    }
+
+
+    /* ==========================================
+       SORT — NEWEST FIRST
+    ========================================== */
+
+    const recent =
+        [...expenses]
+            .sort((a, b) => {
+
+                const dateA =
+                    getExpenseDate(
+                        a.createdAt || a.date
+                    );
+
+                const dateB =
+                    getExpenseDate(
+                        b.createdAt || b.date
+                    );
+
+                if (!dateA && !dateB) return 0;
+
+                if (!dateA) return 1;
+
+                if (!dateB) return -1;
+
+                return dateB - dateA;
+
+            })
+            .slice(0, 5);
+
+
+    /* ==========================================
+       RENDER
+    ========================================== */
+
+    let html = "";
+
+
+    recent.forEach(expense => {
+
+        html += `
+
+            <div class="expense-item">
+
+                <div>
+
+                    <div class="expense-title">
+                        ${expense.title}
+                    </div>
+
+                    <small>
+                        ${expense.category}
+                    </small>
+
                 </div>
 
-                <small>
-                    ${expense.category}
-                </small>
+
+                <div style="text-align:right">
+
+                    <b>
+                        ₹${Number(expense.amount).toFixed(2)}
+                    </b>
+
+                    <br>
+
+                    <small>
+                        ${getName(expense.paidBy)}
+                    </small>
+
+                </div>
 
             </div>
-
-            <div style="text-align:right">
-
-                <b>
-                    ₹${Number(expense.amount).toFixed(2)}
-                </b>
-
-                <br>
-
-                <small>
-                    ${getName(expense.paidBy)}
-                </small>
-
-            </div>
-
-        </div>
 
         `;
 
     });
 
-list.innerHTML = html;
+
+    list.innerHTML = html;
+
 }
 /* ==========================================
    SUMMARY
@@ -122,28 +179,249 @@ function calculateSummary(expenses) {
     const currentUser =
         localStorage.getItem("currentUser");
 
-    let total = 0;
+
+    /* ==========================================
+       DATE
+    ========================================== */
+
+    const now = new Date();
+
+    const currentYear =
+        now.getFullYear();
+
+    const currentMonth =
+        now.getMonth();
+
+
+    /* ==========================================
+       CURRENT MONTH
+    ========================================== */
+
+    let monthlyTotal = 0;
+
+    let monthlyCount = 0;
+
+
+    expenses.forEach(expense => {
+
+        const date =
+            getExpenseDate(expense.createdAt || expense.date);
+
+        if (!date) return;
+
+
+        if (
+            date.getFullYear() === currentYear &&
+            date.getMonth() === currentMonth
+        ) {
+
+            monthlyTotal +=
+                Number(expense.amount) || 0;
+
+            monthlyCount++;
+
+        }
+
+    });
+
+
+    /* ==========================================
+       AVERAGE PER ELAPSED DAY
+    ========================================== */
+
+    const elapsedDays =
+        now.getDate();
+
+    const dailyAverage =
+        elapsedDays > 0
+            ? monthlyTotal / elapsedDays
+            : 0;
+
+
+    /* ==========================================
+       LAST MONTH
+    ========================================== */
+
+    const lastMonthDate =
+        new Date(
+            currentYear,
+            currentMonth - 1,
+            1
+        );
+
+    const lastMonthYear =
+        lastMonthDate.getFullYear();
+
+    const lastMonth =
+        lastMonthDate.getMonth();
+
+
+    let lastMonthTotal = 0;
+
+
+    expenses.forEach(expense => {
+
+        const date =
+            getExpenseDate(expense.createdAt || expense.date);
+
+        if (!date) return;
+
+
+        if (
+            date.getFullYear() === lastMonthYear &&
+            date.getMonth() === lastMonth
+        ) {
+
+            lastMonthTotal +=
+                Number(expense.amount) || 0;
+
+        }
+
+    });
+
+
+    /* ==========================================
+       MONTHLY COMPARISON
+    ========================================== */
+
+    let comparisonText =
+        "— No comparison yet";
+
+    let comparisonClass =
+        "comparison-neutral";
+
+
+    if (lastMonthTotal > 0) {
+
+        const percentage =
+            (
+                (
+                    monthlyTotal -
+                    lastMonthTotal
+                ) /
+                lastMonthTotal
+            ) * 100;
+
+
+        const rounded =
+            Math.abs(percentage).toFixed(0);
+
+
+        if (percentage > 0.01) {
+
+            comparisonText =
+                `↑ ${rounded}% vs last month`;
+
+            comparisonClass =
+                "comparison-up";
+
+        }
+
+        else if (percentage < -0.01) {
+
+            comparisonText =
+                `↓ ${rounded}% vs last month`;
+
+            comparisonClass =
+                "comparison-down";
+
+        }
+
+        else {
+
+            comparisonText =
+                "— Same as last month";
+
+            comparisonClass =
+                "comparison-neutral";
+
+        }
+
+    }
+
+
+    /* ==========================================
+       SPENDING CARD
+    ========================================== */
+
+    const monthlySpending =
+        document.getElementById(
+            "monthlySpending"
+        );
+
+
+    const monthlySpendingMeta =
+        document.getElementById(
+            "monthlySpendingMeta"
+        );
+
+
+    const monthlyComparison =
+        document.getElementById(
+            "monthlyComparison"
+        );
+
+
+    if (monthlySpending) {
+
+        monthlySpending.textContent =
+            `₹${monthlyTotal.toFixed(2)}`;
+
+    }
+
+
+    if (monthlySpendingMeta) {
+
+        monthlySpendingMeta.textContent =
+            `${monthlyCount} ${
+                monthlyCount === 1
+                    ? "expense"
+                    : "expenses"
+            } • Avg ₹${dailyAverage.toFixed(0)}/day`;
+
+    }
+
+
+    if (monthlyComparison) {
+
+        monthlyComparison.textContent =
+            comparisonText;
+
+        monthlyComparison.className =
+            comparisonClass;
+
+    }
+
+
+    /* ==========================================
+       YOUR BALANCE
+    ========================================== */
 
     let balance = 0;
+
 
     expenses.forEach(expense => {
 
         const amount =
-            Number(expense.amount);
-
-        total += amount;
+            Number(expense.amount) || 0;
 
         const members =
             expense.members || [];
 
+
+        if (!members.length) return;
+
+
         const share =
             amount / members.length;
+
 
         if (expense.paidBy === currentUser) {
 
             balance += amount;
 
         }
+
 
         if (members.includes(currentUser)) {
 
@@ -153,33 +431,149 @@ function calculateSummary(expenses) {
 
     });
 
-    document.getElementById("totalExpense")
-        .textContent =
-        `₹${total.toFixed(2)}`;
 
     const balanceBox =
-        document.getElementById("yourBalance");
+        document.getElementById(
+            "yourBalance"
+        );
 
-    balanceBox.textContent =
-        `₹${balance.toFixed(2)}`;
 
-    if (balance > 0) {
+    const balanceStatus =
+        document.getElementById(
+            "balanceStatus"
+        );
 
-        balanceBox.style.color = "#22C55E";
+
+    if (balanceBox) {
+
+        balanceBox.textContent =
+            `₹${Math.abs(balance).toFixed(2)}`;
 
     }
 
-    else if (balance < 0) {
 
-        balanceBox.style.color = "#EF4444";
+    if (balanceStatus) {
+
+        if (balance > 0.01) {
+
+            balanceStatus.textContent =
+                "🟢 You will receive";
+
+            balanceStatus.className =
+                "balance-receive";
+
+        }
+
+        else if (balance < -0.01) {
+
+            balanceStatus.textContent =
+                "🔴 You need to pay";
+
+            balanceStatus.className =
+                "balance-pay";
+
+        }
+
+        else {
+
+            balanceStatus.textContent =
+                "⚪ You're all settled";
+
+            balanceStatus.className =
+                "balance-settled";
+
+        }
+
+    }
+
+
+    /* ==========================================
+       BALANCE COLOR
+    ========================================== */
+
+    if (balanceBox) {
+
+        if (balance > 0.01) {
+
+            balanceBox.style.color =
+                "#22C55E";
+
+        }
+
+        else if (balance < -0.01) {
+
+            balanceBox.style.color =
+                "#EF4444";
+
+        }
+
+        else {
+
+            balanceBox.style.color =
+                "#ffffff";
+
+        }
+
+    }
+
+}
+
+
+/* ==========================================
+   EXPENSE DATE
+========================================== */
+
+function getExpenseDate(value) {
+
+    if (!value) return null;
+
+
+    let date;
+
+
+    if (value.seconds) {
+
+        date =
+            new Date(
+                value.seconds * 1000
+            );
+
+    }
+
+    else if (value._seconds) {
+
+        date =
+            new Date(
+                value._seconds * 1000
+            );
+
+    }
+
+    else if (
+        typeof value.toDate === "function"
+    ) {
+
+        date =
+            value.toDate();
 
     }
 
     else {
 
-        balanceBox.style.color = "#ffffff";
+        date =
+            new Date(value);
 
     }
+
+
+    if (isNaN(date.getTime())) {
+
+        return null;
+
+    }
+
+
+    return date;
 
 }
 

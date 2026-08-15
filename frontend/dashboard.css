@@ -352,3 +352,71 @@ padding:20px;
 }
 
 }
+/* ==========================================
+   DASHBOARD SUMMARY
+========================================== */
+
+.summary-card p {
+
+    margin-top: 6px;
+
+    color: var(--text-light);
+
+    font-size: 13px;
+
+}
+
+
+.summary-card span {
+
+    display: inline-block;
+
+    margin-top: 8px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+}
+
+
+.comparison-up {
+
+    color: #EF4444;
+
+}
+
+
+.comparison-down {
+
+    color: #22C55E;
+
+}
+
+
+.comparison-neutral {
+
+    color: var(--text-light);
+
+}
+
+
+.balance-receive {
+
+    color: #22C55E;
+
+}
+
+
+.balance-pay {
+
+    color: #EF4444;
+
+}
+
+
+.balance-settled {
+
+    color: #ffffff;
+
+}
