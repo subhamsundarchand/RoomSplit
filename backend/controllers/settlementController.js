@@ -60,17 +60,44 @@ exports.getSettlement = async (req, res) => {
 
                 const key = `${from}_${to}`;
 
-                if (!settlementMap[key]) {
+if (!settlementMap[key]) {
 
-                    settlementMap[key] = {
-                        from,
-                        to,
-                        amount: 0
-                    };
+    settlementMap[key] = {
+        from,
+        to,
+        amount: 0,
+        date: expense.createdAt || expense.date || null
+    };
 
-                }
+}
 
-                settlementMap[key].amount += remaining;
+settlementMap[key].amount += remaining;
+
+// Latest expense date rakho
+const currentDate =
+    expense.createdAt?.toDate
+        ? expense.createdAt.toDate()
+        : new Date(
+            expense.createdAt ||
+            expense.date ||
+            0
+        );
+
+const existingDate =
+    settlementMap[key].date?.toDate
+        ? settlementMap[key].date.toDate()
+        : new Date(
+            settlementMap[key].date || 0
+        );
+
+if (currentDate > existingDate) {
+
+    settlementMap[key].date =
+        expense.createdAt ||
+        expense.date ||
+        null;
+
+}
 
             });
 
@@ -82,18 +109,19 @@ exports.getSettlement = async (req, res) => {
          */
 
         const settlements =
-            Object.values(settlementMap).map(item => ({
+    Object.values(settlementMap).map(item => ({
 
-                from: item.from,
+        from: item.from,
 
-                to: item.to,
+        to: item.to,
 
-                amount: Number(
-                    item.amount.toFixed(2)
-                )
+        amount: Number(
+            item.amount.toFixed(2)
+        ),
 
-            }));
+        date: item.date
 
+    }));
 
         /*
          * Final balances
