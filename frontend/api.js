@@ -78,7 +78,7 @@ async function getExpenses() {
 
 async function addExpense(expense) {
 
-    return await apiRequest(
+    const result = await apiRequest(
 
         "/api/expenses",
 
@@ -88,6 +88,14 @@ async function addExpense(expense) {
 
     );
 
+    if (result.success) {
+
+        clearHistoryCache();
+
+    }
+
+    return result;
+
 }
 
 /* ==========================================
@@ -96,7 +104,7 @@ async function addExpense(expense) {
 
 async function updateExpense(id, expense) {
 
-    return await apiRequest(
+    const result = await apiRequest(
 
         "/api/expenses/" + id,
 
@@ -106,6 +114,14 @@ async function updateExpense(id, expense) {
 
     );
 
+    if (result.success) {
+
+        clearHistoryCache();
+
+    }
+
+    return result;
+
 }
 /* ==========================================
    DELETE
@@ -113,13 +129,21 @@ async function updateExpense(id, expense) {
 
 async function deleteExpense(id) {
 
-    return await apiRequest(
+    const result = await apiRequest(
 
         "/api/expenses/" + id,
 
         "DELETE"
 
     );
+
+    if (result.success) {
+
+        clearHistoryCache();
+
+    }
+
+    return result;
 
 }
 
@@ -325,5 +349,10 @@ async function sendReminder(phone, message) {
         }
 
     );
+
+}
+function clearHistoryCache() {
+
+    sessionStorage.removeItem("history");
 
 }

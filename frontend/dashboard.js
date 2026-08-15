@@ -38,7 +38,7 @@ async function loadDashboard() {
 
     try {
 
-        const result = await getHistory();
+        const result = await getCachedHistory();
 
         console.log("Dashboard Result:", result);
 

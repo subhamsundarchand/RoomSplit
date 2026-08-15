@@ -26,18 +26,20 @@ async function loginUser(event) {
 
     event.preventDefault();
 
-    const user = document.getElementById("userSelect").value;
+    const user =
+        document.getElementById("userSelect").value;
 
     if (!user) {
         alert("Please select a user.");
         return;
     }
 
-    localStorage.setItem("currentUser", user.toLowerCase());
+    localStorage.setItem(
+        "currentUser",
+        user.toLowerCase()
+    );
 
-    // Preload history before opening dashboard
-    await getCachedHistory();
-
+    // Do NOT wait for API here
     window.location.replace("dashboard.html");
 
 }
