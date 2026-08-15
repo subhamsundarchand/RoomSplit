@@ -9,28 +9,28 @@ exports.getSettlement = async (req, res) => {
             .get();
 
         const balances = {};
+        const settlements = [];
 
         snapshot.forEach(doc => {
 
             const expense = doc.data();
 
-            const settlements =
+            const expenseSettlements =
                 expense.settlements || [];
 
-            settlements.forEach(settlement => {
+            expenseSettlements.forEach(item => {
 
                 const remaining =
-                    Number(
-                        settlement.remainingAmount || 0
-                    );
+                    Number(item.remainingAmount || 0);
 
                 if (remaining <= 0.01) {
                     return;
                 }
 
-                const from = settlement.from;
-                const to = settlement.to;
+                const from = item.from;
+                const to = item.to;
 
+                // Balance calculation
                 if (!balances[from]) {
                     balances[from] = 0;
                 }
@@ -39,86 +39,26 @@ exports.getSettlement = async (req, res) => {
                     balances[to] = 0;
                 }
 
-                // Person who has to pay
                 balances[from] -= remaining;
-
-                // Person who should receive
                 balances[to] += remaining;
 
-            });
+                // IMPORTANT:
+                // Keep original debtor -> creditor
+                settlements.push({
 
-        });
+                    from,
 
-        const settlements = [];
+                    to,
 
-        const creditors = [];
-        const debtors = [];
-
-        Object.keys(balances).forEach(user => {
-
-            const balance =
-                Number(
-                    balances[user].toFixed(2)
-                );
-
-            if (balance > 0.01) {
-
-                creditors.push({
-                    user,
-                    amount: balance
-                });
-
-            }
-
-            else if (balance < -0.01) {
-
-                debtors.push({
-                    user,
-                    amount: Math.abs(balance)
-                });
-
-            }
-
-        });
-
-        while (
-            creditors.length &&
-            debtors.length
-        ) {
-
-            const creditor = creditors[0];
-            const debtor = debtors[0];
-
-            const pay = Math.min(
-                creditor.amount,
-                debtor.amount
-            );
-
-            settlements.push({
-
-                from: debtor.user,
-
-                to: creditor.user,
-
-                amount:
-                    Number(
-                        pay.toFixed(2)
+                    amount: Number(
+                        remaining.toFixed(2)
                     )
 
+                });
+
             });
 
-            creditor.amount -= pay;
-            debtor.amount -= pay;
-
-            if (creditor.amount < 0.01) {
-                creditors.shift();
-            }
-
-            if (debtor.amount < 0.01) {
-                debtors.shift();
-            }
-
-        }
+        });
 
         res.json({
 
