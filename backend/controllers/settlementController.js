@@ -14,33 +14,36 @@ exports.getSettlement = async (req, res) => {
 
             const expense = doc.data();
 
-            const amount = Number(expense.amount);
+            const settlements =
+                expense.settlements || [];
 
-            const members = expense.members || [];
+            settlements.forEach(settlement => {
 
-            if (!members.length) return;
+                const remaining =
+                    Number(
+                        settlement.remainingAmount || 0
+                    );
 
-            const share = amount / members.length;
-
-            // Paid By
-            if (!balances[expense.paidBy]) {
-
-                balances[expense.paidBy] = 0;
-
-            }
-
-            balances[expense.paidBy] += amount;
-
-            // Split
-            members.forEach(member => {
-
-                if (!balances[member]) {
-
-                    balances[member] = 0;
-
+                if (remaining <= 0.01) {
+                    return;
                 }
 
-                balances[member] -= share;
+                const from = settlement.from;
+                const to = settlement.to;
+
+                if (!balances[from]) {
+                    balances[from] = 0;
+                }
+
+                if (!balances[to]) {
+                    balances[to] = 0;
+                }
+
+                // Person who has to pay
+                balances[from] -= remaining;
+
+                // Person who should receive
+                balances[to] += remaining;
 
             });
 
@@ -53,7 +56,10 @@ exports.getSettlement = async (req, res) => {
 
         Object.keys(balances).forEach(user => {
 
-            const balance = Number(balances[user].toFixed(2));
+            const balance =
+                Number(
+                    balances[user].toFixed(2)
+                );
 
             if (balance > 0.01) {
 
@@ -75,7 +81,10 @@ exports.getSettlement = async (req, res) => {
 
         });
 
-        while (creditors.length && debtors.length) {
+        while (
+            creditors.length &&
+            debtors.length
+        ) {
 
             const creditor = creditors[0];
             const debtor = debtors[0];
@@ -91,7 +100,10 @@ exports.getSettlement = async (req, res) => {
 
                 to: creditor.user,
 
-                amount: Number(pay.toFixed(2))
+                amount:
+                    Number(
+                        pay.toFixed(2)
+                    )
 
             });
 
@@ -99,15 +111,11 @@ exports.getSettlement = async (req, res) => {
             debtor.amount -= pay;
 
             if (creditor.amount < 0.01) {
-
                 creditors.shift();
-
             }
 
             if (debtor.amount < 0.01) {
-
                 debtors.shift();
-
             }
 
         }
@@ -125,6 +133,11 @@ exports.getSettlement = async (req, res) => {
     }
 
     catch (err) {
+
+        console.error(
+            "Settlement Error:",
+            err
+        );
 
         res.status(500).json({
 
