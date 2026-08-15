@@ -2,281 +2,525 @@
    SETTLEMENT PAGE
 ========================================== */
 
-.page-header{
-
-    display:flex;
-    align-items:center;
-    gap:18px;
-    margin-bottom:30px;
-
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 30px;
 }
 
-.page-header a{
+.page-header a {
+    width: 45px;
+    height: 45px;
 
-    width:45px;
-    height:45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    border-radius: 12px;
 
-    border-radius:12px;
+    background: var(--glass);
+    border: 1px solid var(--border);
 
-    background:var(--glass);
+    color: #fff;
 
-    border:1px solid var(--border);
-
-    color:#fff;
-
-    transition:var(--transition);
-
+    transition: var(--transition);
 }
 
-.page-header a:hover{
-
-    background:var(--primary);
-
+.page-header a:hover {
+    background: var(--primary);
 }
 
-.page-header h2{
-
-    font-size:28px;
-    font-weight:700;
-
+.page-header h2 {
+    font-size: 28px;
+    font-weight: 700;
 }
+
 
 /* ==========================================
    SUMMARY CARD
 ========================================== */
 
-.summary-card{
+.summary-card {
+    background: var(--glass);
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 20px;
 
-    background:var(--glass);
+    padding: 30px;
 
-    border:1px solid rgba(255,255,255,.08);
+    text-align: center;
 
-    border-radius:20px;
+    backdrop-filter: blur(18px);
 
-    padding:30px;
-
-    text-align:center;
-
-    backdrop-filter:blur(18px);
-
-    margin-bottom:30px;
-
+    margin-bottom: 30px;
 }
 
-.summary-card h3{
-
-    color:var(--text-light);
-
-    margin-bottom:10px;
-
+.summary-card h3 {
+    color: var(--text-light);
+    margin-bottom: 10px;
 }
 
-.summary-card h1{
-
-    font-size:40px;
-
-    color:var(--primary);
-
+.summary-card h1 {
+    font-size: 40px;
+    color: var(--primary);
 }
+
 
 /* ==========================================
    BALANCES
 ========================================== */
 
-.balances{
+.balances {
+    display: grid;
 
-    display:grid;
+    grid-template-columns: repeat(3, 1fr);
 
-    grid-template-columns:repeat(3,1fr);
+    gap: 20px;
 
-    gap:20px;
-
-    margin-bottom:30px;
-
+    margin-bottom: 30px;
 }
 
-.balance-card{
+.balance-card {
+    background: var(--glass);
 
-    background:var(--glass);
+    border: 1px solid rgba(255, 255, 255, .08);
 
-    border:1px solid rgba(255,255,255,.08);
+    border-radius: 18px;
 
-    border-radius:18px;
+    padding: 22px;
 
-    padding:22px;
+    text-align: center;
 
-    text-align:center;
+    backdrop-filter: blur(18px);
 
-    backdrop-filter:blur(18px);
-
-    transition:.3s;
-
+    transition: .3s;
 }
 
-.balance-card:hover{
-
-    transform:translateY(-4px);
-
+.balance-card:hover {
+    transform: translateY(-4px);
 }
 
-.balance-card h4{
+.balance-card h4 {
+    color: var(--text-light);
 
-    color:var(--text-light);
-
-    margin-bottom:12px;
-
+    margin-bottom: 12px;
 }
 
-.balance-card h2{
-
-    font-size:28px;
-
+.balance-card h2 {
+    font-size: 28px;
 }
+
 
 /* ==========================================
-   SETTLEMENT CARD
+   WHO PAYS WHOM CONTAINER
 ========================================== */
 
-.settlement-card{
-
-    background:var(--glass);
-
-    border:1px solid rgba(255,255,255,.08);
-
-    border-radius:20px;
-
-    padding:30px;
-
-    backdrop-filter:blur(18px);
-
+#settlementList {
+    width: 100%;
 }
 
-.settlement-card h3{
-
-    margin-bottom:25px;
-
-}
 
 /* ==========================================
    SETTLEMENT ITEM
 ========================================== */
 
-.settlement-item{
+.settlement-card {
+    width: 100%;
+    box-sizing: border-box;
 
-    display:flex;
+    display: flex;
 
-    justify-content:space-between;
+    align-items: center;
 
-    align-items:center;
+    justify-content: space-between;
 
-    padding:18px;
+    gap: 25px;
 
-    margin-bottom:15px;
+    min-height: 115px;
 
-    border-radius:15px;
+    padding: 24px 28px;
 
-    background:rgba(255,255,255,.05);
+    margin-bottom: 14px;
 
-    transition:.3s;
+    border-radius: 18px;
 
+    background: rgba(255, 255, 255, 0.08);
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+
+    backdrop-filter: blur(14px);
+
+    transition:
+        transform .2s ease,
+        border-color .2s ease,
+        background .2s ease;
 }
 
-.settlement-item:hover{
+.settlement-card:hover {
+    transform: translateY(-2px);
 
-    background:rgba(255,255,255,.08);
+    background: rgba(255, 255, 255, 0.11);
 
+    border-color: rgba(99, 82, 255, 0.55);
 }
 
-.payer{
 
-    color:#EF4444;
+/* ==========================================
+   PEOPLE
+========================================== */
 
-    font-weight:600;
+.settlement-person {
+    display: flex;
 
+    align-items: center;
+
+    gap: 12px;
+
+    flex: 1;
+
+    min-width: 250px;
 }
 
-.receiver{
+.person-name {
+    font-size: 18px;
 
-    color:#22C55E;
+    font-weight: 700;
 
-    font-weight:600;
-
+    white-space: nowrap;
 }
 
-.amount{
-
-    font-size:20px;
-
-    font-weight:700;
-
-    color:#FBBF24;
-
+.person-name.receiver {
+    color: #22c55e;
 }
+
+.arrow {
+    font-size: 22px;
+
+    opacity: .55;
+}
+
+
+/* ==========================================
+   PAYMENT DETAILS
+========================================== */
+
+.settlement-details {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    min-width: 150px;
+
+    gap: 3px;
+}
+
+.payment-label {
+    font-size: 13px;
+
+    opacity: .55;
+}
+
+.payment-amount {
+    font-size: 25px;
+
+    font-weight: 800;
+}
+
+
+/* ==========================================
+   DATE
+========================================== */
+
+.settlement-date {
+    display: flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    min-width: 125px;
+
+    color: var(--text-light);
+
+    font-size: 14px;
+
+    white-space: nowrap;
+}
+
+
+/* ==========================================
+   STATUS
+========================================== */
+
+.settlement-status {
+    min-width: 95px;
+
+    text-align: center;
+}
+
+.settlement-status span {
+    display: inline-block;
+
+    padding: 7px 12px;
+
+    border-radius: 999px;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    background: rgba(255, 193, 7, .12);
+
+    color: #ffd54a;
+
+    white-space: nowrap;
+}
+
 
 /* ==========================================
    EMPTY STATE
 ========================================== */
 
-.empty-state{
+.empty-settlement {
+    flex-direction: column;
 
-    text-align:center;
+    justify-content: center;
 
-    padding:60px 20px;
+    text-align: center;
 
-    color:var(--text-light);
-
+    min-height: 160px;
 }
 
-.empty-state i{
+.empty-icon {
+    font-size: 35px;
 
-    font-size:60px;
-
-    margin-bottom:15px;
-
-    color:var(--primary);
-
+    margin-bottom: 8px;
 }
+
+.empty-settlement strong {
+    font-size: 18px;
+}
+
+.empty-settlement small {
+    opacity: .55;
+}
+
 
 /* ==========================================
    RESPONSIVE
 ========================================== */
 
-@media(max-width:900px){
+@media (max-width: 900px) {
 
-    .balances{
+    .balances {
+        grid-template-columns: 1fr;
+    }
 
-        grid-template-columns:1fr;
+    .settlement-card {
+        flex-wrap: wrap;
+    }
 
+    .settlement-person {
+        min-width: 220px;
     }
 
 }
 
-@media(max-width:600px){
 
-    .page-header h2{
+/* ==========================================
+   MOBILE
+========================================== */
 
-        font-size:22px;
+@media (max-width: 700px) {
 
+    .page-header h2 {
+        font-size: 22px;
     }
 
-    .summary-card h1{
-
-        font-size:32px;
-
+    .summary-card h1 {
+        font-size: 32px;
     }
 
-    .settlement-item{
+    .settlement-card {
+        flex-direction: column;
 
-        flex-direction:column;
+        align-items: stretch;
 
-        gap:10px;
+        gap: 16px;
 
-        text-align:center;
-
+        padding: 20px;
     }
+
+    .settlement-person {
+        min-width: 0;
+    }
+
+    .settlement-details {
+        min-width: 0;
+    }
+
+    .settlement-date {
+        min-width: 0;
+    }
+
+    .settlement-status {
+        min-width: 0;
+
+        text-align: left;
+    }
+
+    .payment-amount {
+        font-size: 23px;
+    }
+
+}
+/* ==========================================
+   WHO PAYS WHOM SECTION
+========================================== */
+
+.settlement-section {
+
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 30px;
+
+    margin-bottom: 30px;
+
+    border-radius: 20px;
+
+    background: var(--glass);
+
+    border: 1px solid rgba(255,255,255,.08);
+
+    backdrop-filter: blur(18px);
+}
+
+.settlement-section > h3 {
+
+    font-size: 22px;
+
+    margin-bottom: 22px;
+
+    color: #fff;
+}
+
+#settlementList {
+
+    width: 100%;
+}
+/* ==========================================
+   BALANCE STATUS
+========================================== */
+
+.balance-status {
+
+    display: inline-block;
+
+    padding: 6px 12px;
+
+    border-radius: 999px;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    margin-bottom: 10px;
+
+}
+
+.balance-status.to-pay {
+
+    background: rgba(239, 68, 68, .12);
+
+    color: #ff6b6b;
+
+}
+
+.balance-status.to-receive {
+
+    background: rgba(34, 197, 94, .12);
+
+    color: #22c55e;
+
+}
+
+.balance-status.settled {
+
+    background: rgba(255, 255, 255, .08);
+
+    color: var(--text-light);
+
+}
+/* ==========================================
+   SETTLE BUTTON
+========================================== */
+
+.settlement-status {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 8px;
+
+    min-width: 100px;
+
+}
+
+.pending-badge {
+
+    display: inline-block;
+
+    padding: 7px 12px;
+
+    border-radius: 999px;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    background: rgba(255, 193, 7, .12);
+
+    color: #ffd54a;
+
+    white-space: nowrap;
+
+}
+
+
+.settle-btn {
+
+    border: none;
+
+    outline: none;
+
+    cursor: pointer;
+
+    padding: 8px 14px;
+
+    border-radius: 10px;
+
+    background: #22c55e;
+
+    color: white;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    transition: .2s ease;
+
+}
+
+.settle-btn:hover {
+
+    transform: translateY(-2px);
+
+    background: #16a34a;
 
 }

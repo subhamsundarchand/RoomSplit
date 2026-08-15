@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>RoomSplit | Login</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="common.css">
+    <link rel="stylesheet" href="login.css">
+
+</head>
+
+<body>
+
+    <div class="background-blur blur1"></div>
+    <div class="background-blur blur2"></div>
+
+    <main class="login-wrapper">
+
+        <div class="login-card fade">
+
+            <div class="logo">
+
+                <i class="fa-solid fa-house"></i>
+
+                <h1>RoomSplit</h1>
+
+                <p>
+                    Split Room Expenses Easily
+                </p>
+
+            </div>
+
+            <form id="loginForm">
+
+                <div class="input-group">
+
+                    <label>
+
+                        Select User
+
+                    </label>
+
+                    <select id="userSelect" required>
+
+    <option value="subham">👤 Subham</option>
+    <option value="subhankar">👤 Subhankar</option>
+    <option value="soumya">👤 Soumya</option>
+
+                    </select>
+
+                </div>
+
+                <button
+                    type="submit"
+                    class="join-btn">
+
+                    <i class="fa-solid fa-right-to-bracket"></i>
+
+                    Continue
+
+                </button>
+
+            </form>
+
+            <div class="members-info">
+
+                <h3>
+
+                    Features
+
+                </h3>
+
+                <ul>
+
+                    <li>🍗 Food Expenses</li>
+
+                    <li>🛒 Grocery Expenses</li>
+
+                    <li>🎉 Others (Custom Category)</li>
+
+                    <li>💰 Automatic Split</li>
+
+                    <li>📱 Shared Between 3 Members</li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </main>
+
+<script src="api.js"></script>
+<script src="login.js"></script>
+
+</body>
+
+</html>

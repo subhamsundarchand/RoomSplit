@@ -1,0 +1,100 @@
+body{
+
+    margin:0;
+
+    padding:20px;
+
+    background:#0f172a;
+
+    color:white;
+
+    font-family:Arial,sans-serif;
+
+}
+
+.container{
+
+    max-width:600px;
+
+    margin:auto;
+
+}
+
+.card{
+
+    background:#1e293b;
+
+    padding:20px;
+
+    border-radius:12px;
+
+    margin-bottom:20px;
+
+}
+
+h2{
+
+    margin-bottom:25px;
+
+}
+
+h3{
+
+    margin-top:0;
+
+}
+
+select{
+
+    width:100%;
+
+    padding:10px;
+
+    margin-top:8px;
+
+    border-radius:8px;
+
+    border:none;
+
+}
+
+button{
+
+    width:100%;
+
+    padding:14px;
+
+    background:#2563eb;
+
+    color:white;
+
+    border:none;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+}
+
+button:hover{
+
+    background:#1d4ed8;
+
+}
+
+label{
+
+    font-size:15px;
+
+}
+input[type="checkbox"]:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+input[type="checkbox"]:focus-visible {
+    outline: none;
+    box-shadow: none;
+}

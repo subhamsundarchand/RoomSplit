@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>RoomSplit | Settlement</title>
+
+    <!-- Google Font -->
+
+    <link rel="preconnect"
+        href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <!-- CSS -->
+
+    <link rel="stylesheet"
+        href="common.css">
+
+    <link rel="stylesheet"
+        href="settlement.css">
+        <link rel="stylesheet" href="toast.css">
+        
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- Header -->
+
+    <header class="page-header">
+
+        <a href="dashboard.html">
+
+            <i class="fa-solid fa-arrow-left"></i>
+
+        </a>
+
+        <h2>
+
+            Settlement
+
+        </h2>
+
+    </header>
+
+    <!-- Summary -->
+
+    <section class="summary-card">
+
+        <h3>
+
+            Overall Expense
+
+        </h3>
+
+        <h1 id="overallExpense">
+
+            ₹0.00
+
+        </h1>
+
+    </section>
+
+    <!-- Member Balances -->
+
+    <section class="balances">
+
+        <div class="balance-card">
+
+            <h4>Subham</h4>
+
+            <h2 id="balanceSubham">
+
+                ₹0.00
+
+            </h2>
+
+        </div>
+
+        <div class="balance-card">
+
+            <h4>Subhankar</h4>
+
+            <h2 id="balanceSubhankar">
+
+                ₹0.00
+
+            </h2>
+
+        </div>
+
+        <div class="balance-card">
+
+            <h4>Soumya</h4>
+
+            <h2 id="balanceSoumya">
+
+                ₹0.00
+
+            </h2>
+
+        </div>
+
+    </section>
+
+    <!-- Settlement Result -->
+
+   <section class="settlement-card">
+
+    <h3>
+
+        Who Pays Whom
+
+    </h3>
+
+    <div id="settlementList">
+
+        <div class="empty-state">
+
+            <i class="fa-solid fa-money-bill-transfer"></i>
+
+            <p>No Settlement Required</p>
+
+        </div>
+
+    </div>
+
+</section>
+
+</div>
+
+<script src="toast.js"></script>
+<script src="api.js"></script>
+<script src="settlement.js"></script>
+
+</body>
+
+</html>
