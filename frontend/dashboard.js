@@ -72,7 +72,6 @@ function renderRecentExpenses(expenses) {
     if (!expenses || expenses.length === 0) {
 
         list.innerHTML = `
-
             <div class="empty-state">
 
                 <i class="fa-solid fa-receipt"></i>
@@ -82,50 +81,28 @@ function renderRecentExpenses(expenses) {
                 </p>
 
             </div>
-
         `;
 
         return;
-
     }
 
-
-    /* ==========================================
-       SORT — NEWEST FIRST
-    ========================================== */
-
+    // Latest 5 expenses
     const recent =
         [...expenses]
             .sort((a, b) => {
 
                 const dateA =
-                    getExpenseDate(
-                        a.createdAt || a.date
-                    );
+                    new Date(a.date || a.createdAt);
 
                 const dateB =
-                    getExpenseDate(
-                        b.createdAt || b.date
-                    );
-
-                if (!dateA && !dateB) return 0;
-
-                if (!dateA) return 1;
-
-                if (!dateB) return -1;
+                    new Date(b.date || b.createdAt);
 
                 return dateB - dateA;
 
             })
             .slice(0, 5);
 
-
-    /* ==========================================
-       RENDER
-    ========================================== */
-
     let html = "";
-
 
     recent.forEach(expense => {
 
@@ -144,7 +121,6 @@ function renderRecentExpenses(expenses) {
                     </small>
 
                 </div>
-
 
                 <div style="text-align:right">
 
@@ -166,6 +142,22 @@ function renderRecentExpenses(expenses) {
 
     });
 
+    // View All button
+    html += `
+
+        <div class="view-all-wrapper">
+
+            <a href="history.html" class="view-all-btn">
+
+                View All Expenses
+
+                <i class="fa-solid fa-arrow-right"></i>
+
+            </a>
+
+        </div>
+
+    `;
 
     list.innerHTML = html;
 
