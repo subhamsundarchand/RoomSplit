@@ -350,3 +350,285 @@ exports.markSettlementPaid = async (req, res) => {
     }
 
 };
+/* ==========================================
+   MARK SUMMARY SETTLEMENT PAID
+========================================== */
+
+exports.markSummarySettlementPaid = async (req, res) => {
+
+    try {
+
+        const {
+            from,
+            to,
+            amount,
+            method
+        } = req.body;
+
+
+        const payAmount = Number(amount);
+
+
+        if (!from || !to) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Payer and receiver are required"
+
+            });
+
+        }
+
+
+        if (
+            !Number.isFinite(payAmount) ||
+            payAmount <= 0
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Invalid payment amount"
+
+            });
+
+        }
+
+
+        const snapshot = await db
+            .collection("expenses")
+            .get();
+
+
+        let remainingPayment =
+            Number(payAmount.toFixed(2));
+
+
+        const updates = [];
+
+
+        for (const doc of snapshot.docs) {
+
+            if (remainingPayment <= 0.01) {
+                break;
+            }
+
+
+            const expense = doc.data();
+
+            const settlements =
+                Array.isArray(expense.settlements)
+                    ? expense.settlements
+                    : [];
+
+
+            let changed = false;
+
+
+            for (const settlement of settlements) {
+
+                if (remainingPayment <= 0.01) {
+                    break;
+                }
+
+
+                if (
+                    settlement.from !== from ||
+                    settlement.to !== to
+                ) {
+
+                    continue;
+
+                }
+
+
+                const remainingAmount =
+                    Number(
+                        settlement.remainingAmount || 0
+                    );
+
+
+                if (
+                    !Number.isFinite(remainingAmount) ||
+                    remainingAmount <= 0.01
+                ) {
+
+                    continue;
+
+                }
+
+
+                const paymentAmount =
+                    Number(
+                        Math.min(
+                            remainingPayment,
+                            remainingAmount
+                        ).toFixed(2)
+                    );
+
+
+                if (!Array.isArray(settlement.payments)) {
+
+                    settlement.payments = [];
+
+                }
+
+
+                settlement.payments.push({
+
+                    id:
+                        Date.now().toString() +
+                        Math.random()
+                            .toString(36)
+                            .substring(2, 8),
+
+                    amount: paymentAmount,
+
+                    method:
+                        method || "Cash",
+
+                    paidAt:
+                        new Date().toISOString()
+
+                });
+
+
+                settlement.paidAmount =
+                    Number(
+                        (
+                            Number(
+                                settlement.paidAmount || 0
+                            ) +
+                            paymentAmount
+                        ).toFixed(2)
+                    );
+
+
+                settlement.remainingAmount =
+                    Number(
+                        Math.max(
+                            0,
+                            Number(
+                                settlement.pendingAmount || 0
+                            ) -
+                            settlement.paidAmount
+                        ).toFixed(2)
+                    );
+
+
+                if (
+                    settlement.remainingAmount <= 0.01
+                ) {
+
+                    settlement.remainingAmount = 0;
+
+                    settlement.status = "Paid";
+
+                }
+
+                else {
+
+                    settlement.status = "Partial";
+
+                }
+
+
+                remainingPayment =
+                    Number(
+                        (
+                            remainingPayment -
+                            paymentAmount
+                        ).toFixed(2)
+                    );
+
+
+                changed = true;
+
+            }
+
+
+            if (changed) {
+
+                updates.push({
+
+                    ref: doc.ref,
+
+                    settlements
+
+                });
+
+            }
+
+        }
+
+
+        if (remainingPayment > 0.01) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Payment exceeds pending settlement",
+
+                remainingAmount:
+                    remainingPayment
+
+            });
+
+        }
+
+
+        for (const update of updates) {
+
+            await update.ref.update({
+
+                settlements:
+                    update.settlements
+
+            });
+
+        }
+
+
+        return res.json({
+
+            success: true,
+
+            message: "Payment Saved",
+
+            from,
+
+            to,
+
+            amount: payAmount,
+
+            method:
+                method || "Cash"
+
+        });
+
+    }
+
+    catch (err) {
+
+        console.error(
+            "SUMMARY SETTLEMENT ERROR:",
+            err
+        );
+
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: err.message
+
+        });
+
+    }
+
+};
