@@ -38,11 +38,13 @@ async function loadDashboard() {
 
     try {
 
-        const result = await getCachedHistory();
+        const expenses =
+            await getCachedHistory();
 
-        console.log("Dashboard Result:", result);
-
-        const expenses = result.data;
+        console.log(
+            "Dashboard Expenses:",
+            expenses
+        );
 
         renderRecentExpenses(expenses);
 
@@ -52,9 +54,15 @@ async function loadDashboard() {
 
     catch (err) {
 
-        console.error(err);
+        console.error(
+            "Dashboard Error:",
+            err
+        );
 
-        alert("Unable to load dashboard.");
+        showToast(
+            "Unable to load dashboard.",
+            "error"
+        );
 
     }
 
