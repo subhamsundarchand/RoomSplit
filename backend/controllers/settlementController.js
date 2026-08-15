@@ -1,5 +1,9 @@
 const db = require("../firebase/firebase");
 
+/* ==========================================
+   GET SETTLEMENT
+========================================== */
+
 exports.getSettlement = async (req, res) => {
 
     try {
@@ -8,57 +12,172 @@ exports.getSettlement = async (req, res) => {
             .collection("expenses")
             .get();
 
-        const balances = {};
-        const settlements = [];
+        /*
+         * net[user] = user ko kitna dena/ lena hai
+         *
+         * Positive  = user ko paisa milna hai
+         * Negative  = user ko paisa dena hai
+         */
+
+        const net = {};
 
         snapshot.forEach(doc => {
 
             const expense = doc.data();
 
-            const expenseSettlements =
+            const settlements =
                 expense.settlements || [];
 
-            expenseSettlements.forEach(item => {
+            settlements.forEach(settlement => {
+
+                /*
+                 * Sirf unpaid amount consider karo.
+                 *
+                 * Paid settlement dobara calculation
+                 * mein nahi aayega.
+                 */
 
                 const remaining =
-                    Number(item.remainingAmount || 0);
+                    Number(settlement.remainingAmount || 0);
 
-                if (remaining <= 0.01) {
-                    return;
+                if (remaining <= 0) return;
+
+                const from = settlement.from;
+                const to = settlement.to;
+
+                if (!net[from]) {
+                    net[from] = 0;
                 }
 
-                const from = item.from;
-                const to = item.to;
-
-                // Balance calculation
-                if (!balances[from]) {
-                    balances[from] = 0;
+                if (!net[to]) {
+                    net[to] = 0;
                 }
 
-                if (!balances[to]) {
-                    balances[to] = 0;
-                }
+                // from ko paisa dena hai
+                net[from] -= remaining;
 
-                balances[from] -= remaining;
-                balances[to] += remaining;
-
-                // IMPORTANT:
-                // Keep original debtor -> creditor
-                settlements.push({
-
-                    from,
-
-                    to,
-
-                    amount: Number(
-                        remaining.toFixed(2)
-                    )
-
-                });
+                // to ko paisa milna hai
+                net[to] += remaining;
 
             });
 
         });
+
+
+        /* ==========================================
+           BALANCES
+        ========================================== */
+
+        const balances = {
+
+            subham: Number(
+                (net.subham || 0).toFixed(2)
+            ),
+
+            subhankar: Number(
+                (net.subhankar || 0).toFixed(2)
+            ),
+
+            soumya: Number(
+                (net.soumya || 0).toFixed(2)
+            )
+
+        };
+
+
+        /* ==========================================
+           CREATE DEBTORS / CREDITORS
+        ========================================== */
+
+        const creditors = [];
+        const debtors = [];
+
+        Object.keys(net).forEach(user => {
+
+            const amount =
+                Number(net[user].toFixed(2));
+
+            if (amount > 0.01) {
+
+                creditors.push({
+                    user,
+                    amount
+                });
+
+            }
+
+            else if (amount < -0.01) {
+
+                debtors.push({
+                    user,
+                    amount: Math.abs(amount)
+                });
+
+            }
+
+        });
+
+
+        /* ==========================================
+           MINIMUM TRANSACTIONS
+        ========================================== */
+
+        const settlements = [];
+
+        while (
+            creditors.length &&
+            debtors.length
+        ) {
+
+            const creditor = creditors[0];
+            const debtor = debtors[0];
+
+            const pay = Math.min(
+                creditor.amount,
+                debtor.amount
+            );
+
+            settlements.push({
+
+                from: debtor.user,
+
+                to: creditor.user,
+
+                amount: Number(
+                    pay.toFixed(2)
+                )
+
+            });
+
+            creditor.amount =
+                Number(
+                    (creditor.amount - pay).toFixed(2)
+                );
+
+            debtor.amount =
+                Number(
+                    (debtor.amount - pay).toFixed(2)
+                );
+
+
+            if (creditor.amount <= 0.01) {
+
+                creditors.shift();
+
+            }
+
+            if (debtor.amount <= 0.01) {
+
+                debtors.shift();
+
+            }
+
+        }
+
+
+        /* ==========================================
+           RESPONSE
+        ========================================== */
 
         res.json({
 
@@ -90,6 +209,8 @@ exports.getSettlement = async (req, res) => {
     }
 
 };
+
+
 /* ==========================================
    MARK SETTLEMENT PAID
 ========================================== */
@@ -99,19 +220,20 @@ exports.markSettlementPaid = async (req, res) => {
     try {
 
         const {
-
             expenseId,
             settlementId,
             amount,
             method
-
         } = req.body;
+
 
         const ref = db
             .collection("expenses")
             .doc(expenseId);
 
+
         const doc = await ref.get();
+
 
         if (!doc.exists) {
 
@@ -125,15 +247,18 @@ exports.markSettlementPaid = async (req, res) => {
 
         }
 
+
         const expense = doc.data();
 
-        const settlements = expense.settlements || [];
+        const settlements =
+            expense.settlements || [];
 
-        const settlement = settlements.find(
 
-            s => s.id === settlementId
+        const settlement =
+            settlements.find(
+                s => s.id === settlementId
+            );
 
-        );
 
         if (!settlement) {
 
@@ -147,9 +272,15 @@ exports.markSettlementPaid = async (req, res) => {
 
         }
 
-        const payAmount = Number(amount);
 
-        if (isNaN(payAmount) || payAmount <= 0) {
+        const payAmount =
+            Number(amount);
+
+
+        if (
+            isNaN(payAmount) ||
+            payAmount <= 0
+        ) {
 
             return res.json({
 
@@ -161,17 +292,23 @@ exports.markSettlementPaid = async (req, res) => {
 
         }
 
-        if (payAmount > settlement.remainingAmount) {
+
+        if (
+            payAmount >
+            Number(settlement.remainingAmount)
+        ) {
 
             return res.json({
 
                 success: false,
 
-                message: "Amount exceeds remaining balance"
+                message:
+                    "Amount exceeds remaining balance"
 
             });
 
         }
+
 
         settlement.payments.push({
 
@@ -182,25 +319,33 @@ exports.markSettlementPaid = async (req, res) => {
 
             method,
 
-            paidAt: new Date().toISOString()
+            paidAt:
+                new Date().toISOString()
 
         });
 
-        settlement.paidAmount += payAmount;
+
+        settlement.paidAmount =
+            Number(
+                (
+                    Number(settlement.paidAmount || 0) +
+                    payAmount
+                ).toFixed(2)
+            );
+
 
         settlement.remainingAmount =
             Number(
-
                 (
-                    settlement.pendingAmount -
-
+                    Number(settlement.pendingAmount) -
                     settlement.paidAmount
-
                 ).toFixed(2)
-
             );
 
-        if (settlement.remainingAmount <= 0) {
+
+        if (
+            settlement.remainingAmount <= 0
+        ) {
 
             settlement.remainingAmount = 0;
 
@@ -214,11 +359,11 @@ exports.markSettlementPaid = async (req, res) => {
 
         }
 
+
         await ref.update({
-
             settlements
-
         });
+
 
         res.json({
 
@@ -226,13 +371,16 @@ exports.markSettlementPaid = async (req, res) => {
 
             settlement,
 
-            message: "Payment Saved"
+            message:
+                "Payment Saved"
 
         });
 
     }
 
     catch (err) {
+
+        console.error(err);
 
         res.status(500).json({
 
