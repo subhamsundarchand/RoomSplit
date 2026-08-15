@@ -524,3 +524,110 @@
     background: #16a34a;
 
 }
+/* ==========================================
+   PAYMENT METHODS
+========================================== */
+
+.payment-methods {
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 12px;
+
+}
+
+
+.payment-method {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    padding: 15px;
+
+    border-radius: 14px;
+
+    border: 1px solid rgba(255,255,255,.08);
+
+    background: rgba(255,255,255,.05);
+
+    color: #fff;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: .2s ease;
+
+}
+
+
+.payment-method:hover {
+
+    background: rgba(255,255,255,.09);
+
+    transform: translateY(-1px);
+
+}
+
+
+.payment-method.active {
+
+    background: rgba(99,82,255,.18);
+
+    border-color: var(--primary);
+
+    box-shadow:
+        0 0 0 1px rgba(99,82,255,.2);
+
+}
+
+
+.payment-method-icon {
+
+    font-size: 21px;
+
+}
+
+
+/* ==========================================
+   CONFIRM BUTTON
+========================================== */
+
+.settle-confirm-btn {
+
+    background: #22c55e;
+
+    color: #fff;
+
+}
+
+
+.settle-confirm-btn:hover {
+
+    background: #16a34a;
+
+}
+
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media(max-width:600px) {
+
+    .payment-methods {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}

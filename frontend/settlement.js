@@ -258,15 +258,18 @@ function renderTransactions(settlements) {
     </span>
 
     <button
-        class="settle-btn"
-        onclick="openSettleModal(
+    type="button"
+    class="settle-btn"
+    onclick="
+        openSettleModal(
             '${item.from}',
             '${item.to}',
             ${amount}
-        )"
-    >
-        💰 Settle
-    </button>
+        )
+    "
+>
+    💰 Settle
+</button>
 
 </div>
 
@@ -449,6 +452,227 @@ async function openSettleModal(
 
         showToast(
             "Server Error",
+            "error"
+        );
+
+    }
+
+}
+/* ==========================================
+   PAYMENT METHOD
+========================================== */
+
+let selectedPaymentMethod = "Cash";
+
+
+function selectPaymentMethod(method) {
+
+    selectedPaymentMethod = method;
+
+
+    document
+        .querySelectorAll(".payment-method")
+        .forEach(button => {
+
+            button.classList.remove("active");
+
+        });
+
+
+    const selectedButton =
+        document.querySelector(
+            `.payment-method[data-method="${method}"]`
+        );
+
+
+    if (selectedButton) {
+
+        selectedButton.classList.add("active");
+
+    }
+
+}
+
+
+/* ==========================================
+   OPEN MODAL
+========================================== */
+
+function openSettleModal(from, to, amount) {
+
+    const modal =
+        document.getElementById("settleModal");
+
+
+    document.getElementById("settleFrom")
+        .textContent =
+        capitalize(from);
+
+
+    document.getElementById("settleTo")
+        .textContent =
+        capitalize(to);
+
+
+    document.getElementById("settleAmount")
+        .textContent =
+        `₹${Number(amount).toFixed(2)}`;
+
+
+    modal.dataset.from = from;
+
+    modal.dataset.to = to;
+
+    modal.dataset.amount = amount;
+
+
+    selectPaymentMethod("Cash");
+
+
+    modal.classList.add("show");
+
+}
+
+
+/* ==========================================
+   CLOSE MODAL
+========================================== */
+
+function closeSettleModal() {
+
+    const modal =
+        document.getElementById("settleModal");
+
+
+    modal.classList.remove("show");
+
+}
+
+
+/* ==========================================
+   CONFIRM PAYMENT
+========================================== */
+
+async function confirmSettlementPayment() {
+
+    const modal =
+        document.getElementById("settleModal");
+
+
+    const from =
+        modal.dataset.from;
+
+
+    const to =
+        modal.dataset.to;
+
+
+    const amount =
+        Number(modal.dataset.amount);
+
+
+    const method =
+        selectedPaymentMethod;
+
+
+    if (
+        !from ||
+        !to ||
+        !Number.isFinite(amount) ||
+        amount <= 0
+    ) {
+
+        showToast(
+            "Invalid settlement",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `${API_URL}/api/settlement/pay-summary`,
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body: JSON.stringify({
+
+                        from,
+
+                        to,
+
+                        amount,
+
+                        method
+
+                    })
+
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (
+            !response.ok ||
+            !result.success
+        ) {
+
+            console.error(
+                "Settlement Error:",
+                result
+            );
+
+
+            showToast(
+                result.message ||
+                "Payment failed",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        closeSettleModal();
+
+
+        showToast(
+            `${method} payment recorded`,
+            "success"
+        );
+
+
+        await loadSettlement();
+
+    }
+
+    catch (err) {
+
+        console.error(
+            "Settlement Request Error:",
+            err
+        );
+
+
+        showToast(
+            "Unable to connect to server",
             "error"
         );
 

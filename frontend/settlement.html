@@ -122,7 +122,7 @@
 
     </section>
 
-    <!-- Settlement Result -->
+
 
    <!-- Settlement Result -->
 
@@ -145,6 +145,156 @@
     </div>
 
 </section>
+
+<!-- ==========================================
+     SETTLEMENT MODAL
+========================================== -->
+
+<div id="settleModal" class="settle-modal">
+
+    <div class="settle-modal-box">
+
+        <button
+            type="button"
+            class="settle-modal-close"
+            onclick="closeSettleModal()"
+        >
+            ×
+        </button>
+
+        <div class="settle-modal-icon">
+            💰
+        </div>
+
+        <h2>Settle Payment</h2>
+
+        <p class="settle-modal-subtitle">
+            Record this payment
+        </p>
+
+
+        <!-- TRANSFER -->
+
+        <div class="settle-transfer">
+
+            <div>
+
+                <span>From</span>
+
+                <strong id="settleFrom">
+                    Subhankar
+                </strong>
+
+            </div>
+
+            <div class="transfer-arrow">
+                →
+            </div>
+
+            <div>
+
+                <span>To</span>
+
+                <strong id="settleTo">
+                    Subham
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- AMOUNT -->
+
+        <div class="settle-amount-box">
+
+            <span>
+                Pending Amount
+            </span>
+
+            <strong id="settleAmount">
+                ₹59.00
+            </strong>
+
+        </div>
+
+
+        <!-- PAYMENT METHOD -->
+
+        <div class="settle-form-group">
+
+            <label>
+                Payment Method
+            </label>
+
+            <div class="payment-methods">
+
+                <button
+                    type="button"
+                    class="payment-method active"
+                    data-method="Cash"
+                    onclick="selectPaymentMethod('Cash')"
+                >
+
+                    <span class="payment-method-icon">
+                        💵
+                    </span>
+
+                    <span>
+                        Cash
+                    </span>
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="payment-method"
+                    data-method="UPI"
+                    onclick="selectPaymentMethod('UPI')"
+                >
+
+                    <span class="payment-method-icon">
+                        📱
+                    </span>
+
+                    <span>
+                        UPI
+                    </span>
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- ACTIONS -->
+
+        <div class="settle-modal-actions">
+
+            <button
+                type="button"
+                class="settle-cancel-btn"
+                onclick="closeSettleModal()"
+            >
+                Cancel
+            </button>
+
+
+            <button
+                type="button"
+                class="settle-confirm-btn"
+                onclick="confirmSettlementPayment()"
+            >
+                ✓ Confirm Payment
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
 
 </div>
 
