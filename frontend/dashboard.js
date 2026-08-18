@@ -200,6 +200,7 @@ function calculateSummary(expenses) {
 let groceryExpenses = 0;
 
 let groceryDays = new Set();
+let groceryPerHeadTotal = 0;
 
     expenses.forEach(expense => {
 
@@ -230,7 +231,7 @@ let groceryDays = new Set();
             );
 
         }
-        /* ==========================================
+       /* ==========================================
    GROCERY SPENDING
 ========================================== */
 
@@ -249,7 +250,22 @@ if (
         expenseDate.toISOString().split("T")[0]
     );
 
+
+    const members =
+        expense.members || [];
+
+    const memberCount =
+        members.length;
+
+    if (memberCount > 0) {
+
+        groceryPerHeadTotal +=
+            amount / memberCount;
+
+    }
+
 }
+
 
 
         /* ==========================================
@@ -306,6 +322,8 @@ if (
 
 const groceryAverage =
     groceryTotal / groceryDayCount;
+    const groceryPerHeadDaily =
+    groceryPerHeadTotal / groceryDayCount;
     /* ==========================================
    GROCERY CARD
 ========================================== */
@@ -318,8 +336,9 @@ document.getElementById(
 
 document.getElementById(
     "grocerySpendingMeta"
-).textContent =
-    `${groceryExpenses} grocery expenses • Avg ₹${groceryAverage.toFixed(0)}/day`;
+).innerHTML =
+    `${groceryExpenses} grocery expenses • Avg ₹${groceryAverage.toFixed(0)}/day<br>
+     <strong>₹${groceryPerHeadDaily.toFixed(2)} per head/day</strong>`;
 
 
     /* ==========================================
