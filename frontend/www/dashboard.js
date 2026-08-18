@@ -393,12 +393,10 @@ function calculateSummary(expenses) {
 ========================================== */
 
 const yourSpendingBox =
-    document.getElementById(
-        "yourSpending"
-    );
+    document.getElementById("yourSpending");
 
 yourSpendingBox.textContent =
-    `₹${Math.max(0, yourSpending).toFixed(2)}`;
+    `₹${yourPaidTotal.toFixed(2)}`;
     /* ==========================================
        HAVE TO PAY
     ========================================== */
