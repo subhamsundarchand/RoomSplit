@@ -390,3 +390,16 @@ function getName(id) {
     }
 
 }
+/* ==========================================
+   LOGOUT
+========================================== */
+
+function logout() {
+
+    localStorage.removeItem("currentUser");
+
+    sessionStorage.removeItem("history");
+
+    window.location.replace("index.html");
+
+}
