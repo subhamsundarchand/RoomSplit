@@ -195,6 +195,11 @@ function calculateSummary(expenses) {
 
     let balance = 0;
 
+    let groceryTotal = 0;
+
+let groceryExpenses = 0;
+
+let groceryDays = new Set();
 
     expenses.forEach(expense => {
 
@@ -225,6 +230,26 @@ function calculateSummary(expenses) {
             );
 
         }
+        /* ==========================================
+   GROCERY SPENDING
+========================================== */
+
+if (
+    expense.category &&
+    expense.category.toLowerCase() === "grocery" &&
+    expenseDate.getMonth() === currentMonth &&
+    expenseDate.getFullYear() === currentYear
+) {
+
+    groceryTotal += amount;
+
+    groceryExpenses++;
+
+    groceryDays.add(
+        expenseDate.toISOString().split("T")[0]
+    );
+
+}
 
 
         /* ==========================================
@@ -276,6 +301,25 @@ function calculateSummary(expenses) {
 
     const average =
         monthlyTotal / days;
+        const groceryDayCount =
+    groceryDays.size || 1;
+
+const groceryAverage =
+    groceryTotal / groceryDayCount;
+    /* ==========================================
+   GROCERY CARD
+========================================== */
+
+document.getElementById(
+    "grocerySpending"
+).textContent =
+    `₹${groceryTotal.toFixed(2)}`;
+
+
+document.getElementById(
+    "grocerySpendingMeta"
+).textContent =
+    `${groceryExpenses} grocery expenses • Avg ₹${groceryAverage.toFixed(0)}/day`;
 
 
     /* ==========================================
