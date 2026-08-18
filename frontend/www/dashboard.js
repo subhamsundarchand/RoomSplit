@@ -235,12 +235,14 @@ function calculateSummary(expenses) {
         ========================================== */
 
         if (
-            expense.paidBy === currentUser
-        ) {
+    expense.paidBy === currentUser &&
+    expenseDate.getMonth() === currentMonth &&
+    expenseDate.getFullYear() === currentYear
+) {
 
-            yourPaidTotal += amount;
+    yourPaidTotal += amount;
 
-        }
+}
 
 
         /* ==========================================
@@ -386,21 +388,17 @@ function calculateSummary(expenses) {
         `₹${groceryPerHeadDaily.toFixed(2)} per head/day`;
 
 
-    /* ==========================================
-       YOUR SPENDING
-    ========================================== */
+/* ==========================================
+   YOUR SPENDING
+========================================== */
 
-    const yourSpendingBox =
-        document.getElementById(
-    "yourSpending"
-).textContent =
-    `₹${yourPaidTotal.toFixed(2)}`;
+const yourSpendingBox =
+    document.getElementById(
+        "yourSpending"
+    );
 
-
-    yourSpendingBox.textContent =
-        `₹${Math.max(0, yourSpending).toFixed(2)}`;
-
-
+yourSpendingBox.textContent =
+    `₹${Math.max(0, yourSpending).toFixed(2)}`;
     /* ==========================================
        HAVE TO PAY
     ========================================== */
