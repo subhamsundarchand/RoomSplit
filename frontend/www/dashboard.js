@@ -392,8 +392,9 @@ function calculateSummary(expenses) {
 
     const yourSpendingBox =
         document.getElementById(
-            "yourSpending"
-        );
+    "yourSpending"
+).textContent =
+    `₹${yourPaidTotal.toFixed(2)}`;
 
 
     yourSpendingBox.textContent =

@@ -206,13 +206,23 @@ let groceryPerHeadTotal = 0;
 
     expenses.forEach(expense => {
 
-        const amount =
-            Number(expense.amount) || 0;
-            if (expense.paidBy === currentUser) {
+    const amount =
+        Number(expense.amount) || 0;
 
-    yourPaidTotal += amount;
+    const expenseDate =
+        new Date(
+            expense.date || expense.createdAt
+        );
 
-}
+    if (
+        expense.paidBy === currentUser &&
+        expenseDate.getMonth() === currentMonth &&
+        expenseDate.getFullYear() === currentYear
+    ) {
+
+        yourPaidTotal += amount;
+
+    }
 
 
         /* ==========================================
