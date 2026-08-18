@@ -179,223 +179,19 @@ function calculateSummary(expenses) {
     const currentUser =
         localStorage.getItem("currentUser");
 
-
-    /* ==========================================
-       DATE
-    ========================================== */
-
     const now = new Date();
-
-    const currentYear =
-        now.getFullYear();
 
     const currentMonth =
         now.getMonth();
 
-
-    /* ==========================================
-       CURRENT MONTH
-    ========================================== */
+    const currentYear =
+        now.getFullYear();
 
     let monthlyTotal = 0;
 
-    let monthlyCount = 0;
+    let monthlyExpenses = 0;
 
-
-    expenses.forEach(expense => {
-
-        const date =
-            getExpenseDate(expense.createdAt || expense.date);
-
-        if (!date) return;
-
-
-        if (
-            date.getFullYear() === currentYear &&
-            date.getMonth() === currentMonth
-        ) {
-
-            monthlyTotal +=
-                Number(expense.amount) || 0;
-
-            monthlyCount++;
-
-        }
-
-    });
-
-
-    /* ==========================================
-       AVERAGE PER ELAPSED DAY
-    ========================================== */
-
-    const elapsedDays =
-        now.getDate();
-
-    const dailyAverage =
-        elapsedDays > 0
-            ? monthlyTotal / elapsedDays
-            : 0;
-
-
-    /* ==========================================
-       LAST MONTH
-    ========================================== */
-
-    const lastMonthDate =
-        new Date(
-            currentYear,
-            currentMonth - 1,
-            1
-        );
-
-    const lastMonthYear =
-        lastMonthDate.getFullYear();
-
-    const lastMonth =
-        lastMonthDate.getMonth();
-
-
-    let lastMonthTotal = 0;
-
-
-    expenses.forEach(expense => {
-
-        const date =
-            getExpenseDate(expense.createdAt || expense.date);
-
-        if (!date) return;
-
-
-        if (
-            date.getFullYear() === lastMonthYear &&
-            date.getMonth() === lastMonth
-        ) {
-
-            lastMonthTotal +=
-                Number(expense.amount) || 0;
-
-        }
-
-    });
-
-
-    /* ==========================================
-       MONTHLY COMPARISON
-    ========================================== */
-
-    let comparisonText =
-        "— No comparison yet";
-
-    let comparisonClass =
-        "comparison-neutral";
-
-
-    if (lastMonthTotal > 0) {
-
-        const percentage =
-            (
-                (
-                    monthlyTotal -
-                    lastMonthTotal
-                ) /
-                lastMonthTotal
-            ) * 100;
-
-
-        const rounded =
-            Math.abs(percentage).toFixed(0);
-
-
-        if (percentage > 0.01) {
-
-            comparisonText =
-                `↑ ${rounded}% vs last month`;
-
-            comparisonClass =
-                "comparison-up";
-
-        }
-
-        else if (percentage < -0.01) {
-
-            comparisonText =
-                `↓ ${rounded}% vs last month`;
-
-            comparisonClass =
-                "comparison-down";
-
-        }
-
-        else {
-
-            comparisonText =
-                "— Same as last month";
-
-            comparisonClass =
-                "comparison-neutral";
-
-        }
-
-    }
-
-
-    /* ==========================================
-       SPENDING CARD
-    ========================================== */
-
-    const monthlySpending =
-        document.getElementById(
-            "monthlySpending"
-        );
-
-
-    const monthlySpendingMeta =
-        document.getElementById(
-            "monthlySpendingMeta"
-        );
-
-
-    const monthlyComparison =
-        document.getElementById(
-            "monthlyComparison"
-        );
-
-
-    if (monthlySpending) {
-
-        monthlySpending.textContent =
-            `₹${monthlyTotal.toFixed(2)}`;
-
-    }
-
-
-    if (monthlySpendingMeta) {
-
-        monthlySpendingMeta.textContent =
-            `${monthlyCount} ${
-                monthlyCount === 1
-                    ? "expense"
-                    : "expenses"
-            } • Avg ₹${dailyAverage.toFixed(0)}/day`;
-
-    }
-
-
-    if (monthlyComparison) {
-
-        monthlyComparison.textContent =
-            comparisonText;
-
-        monthlyComparison.className =
-            comparisonClass;
-
-    }
-
-
-    /* ==========================================
-       YOUR BALANCE
-    ========================================== */
+    let monthlyDays = new Set();
 
     let balance = 0;
 
@@ -405,38 +201,113 @@ function calculateSummary(expenses) {
         const amount =
             Number(expense.amount) || 0;
 
-        const members =
-            expense.members || [];
 
+        /* ==========================================
+           MONTHLY SPENDING
+        ========================================== */
 
-        if (!members.length) return;
+        const expenseDate =
+            new Date(
+                expense.date || expense.createdAt
+            );
 
+        if (
+            expenseDate.getMonth() === currentMonth &&
+            expenseDate.getFullYear() === currentYear
+        ) {
 
-        const share =
-            amount / members.length;
+            monthlyTotal += amount;
 
+            monthlyExpenses++;
 
-        if (expense.paidBy === currentUser) {
-
-            balance += amount;
+            monthlyDays.add(
+                expenseDate.toISOString().split("T")[0]
+            );
 
         }
 
 
-        if (members.includes(currentUser)) {
+        /* ==========================================
+           REAL BALANCE
+           ONLY UNPAID AMOUNT
+        ========================================== */
 
-            balance -= share;
+        const settlements =
+            expense.settlements || [];
 
-        }
+        settlements.forEach(settlement => {
+
+            const remaining =
+                Number(
+                    settlement.remainingAmount || 0
+                );
+
+            if (remaining <= 0) {
+                return;
+            }
+
+            if (
+                settlement.from === currentUser
+            ) {
+
+                balance -= remaining;
+
+            }
+
+            if (
+                settlement.to === currentUser
+            ) {
+
+                balance += remaining;
+
+            }
+
+        });
 
     });
 
+
+    /* ==========================================
+       AVERAGE PER DAY
+    ========================================== */
+
+    const days =
+        monthlyDays.size || 1;
+
+    const average =
+        monthlyTotal / days;
+
+
+    /* ==========================================
+       SPENDING CARD
+    ========================================== */
+
+    document.getElementById(
+        "monthlySpending"
+    ).textContent =
+        `₹${monthlyTotal.toFixed(2)}`;
+
+
+    document.getElementById(
+        "monthlySpendingMeta"
+    ).textContent =
+        `${monthlyExpenses} expenses • Avg ₹${average.toFixed(0)}/day`;
+
+
+    document.getElementById(
+        "monthlyComparison"
+    ).textContent =
+        "— vs last month";
+
+
+    /* ==========================================
+       BALANCE CARD
+    ========================================== */
 
     const balanceBox =
         document.getElementById(
             "yourBalance"
         );
-
 
     const balanceStatus =
         document.getElementById(
@@ -444,170 +315,54 @@ function calculateSummary(expenses) {
         );
 
 
-    if (balanceBox) {
+    if (balance > 0.01) {
 
         balanceBox.textContent =
-            `₹${Math.abs(balance).toFixed(2)}`;
+            `₹${balance.toFixed(2)}`;
 
-    }
+        balanceBox.style.color =
+            "#22C55E";
 
-
-    if (balanceStatus) {
-
-        if (balance > 0.01) {
+        if (balanceStatus) {
 
             balanceStatus.textContent =
                 "🟢 You will receive";
 
-            balanceStatus.className =
-                "balance-receive";
-
         }
 
-        else if (balance < -0.01) {
+    }
+
+    else if (balance < -0.01) {
+
+        balanceBox.textContent =
+            `₹${Math.abs(balance).toFixed(2)}`;
+
+        balanceBox.style.color =
+            "#EF4444";
+
+        if (balanceStatus) {
 
             balanceStatus.textContent =
                 "🔴 You need to pay";
 
-            balanceStatus.className =
-                "balance-pay";
-
         }
-
-        else {
-
-            balanceStatus.textContent =
-                "⚪ You're all settled";
-
-            balanceStatus.className =
-                "balance-settled";
-
-        }
-
-    }
-
-
-    /* ==========================================
-       BALANCE COLOR
-    ========================================== */
-
-    if (balanceBox) {
-
-        if (balance > 0.01) {
-
-            balanceBox.style.color =
-                "#22C55E";
-
-        }
-
-        else if (balance < -0.01) {
-
-            balanceBox.style.color =
-                "#EF4444";
-
-        }
-
-        else {
-
-            balanceBox.style.color =
-                "#ffffff";
-
-        }
-
-    }
-
-}
-
-
-/* ==========================================
-   EXPENSE DATE
-========================================== */
-
-function getExpenseDate(value) {
-
-    if (!value) return null;
-
-
-    let date;
-
-
-    if (value.seconds) {
-
-        date =
-            new Date(
-                value.seconds * 1000
-            );
-
-    }
-
-    else if (value._seconds) {
-
-        date =
-            new Date(
-                value._seconds * 1000
-            );
-
-    }
-
-    else if (
-        typeof value.toDate === "function"
-    ) {
-
-        date =
-            value.toDate();
 
     }
 
     else {
 
-        date =
-            new Date(value);
+        balanceBox.textContent =
+            "₹0.00";
 
-    }
+        balanceBox.style.color =
+            "#22C55E";
 
+        if (balanceStatus) {
 
-    if (isNaN(date.getTime())) {
+            balanceStatus.textContent =
+                "🟢 You're all settled";
 
-        return null;
-
-    }
-
-
-    return date;
-
-}
-
-/* ==========================================
-   LOGOUT
-========================================== */
-
-function logout() {
-
-    localStorage.removeItem("currentUser");
-
-    window.location.replace("index.html");
-
-}
-
-/* ==========================================
-   USER NAME
-========================================== */
-
-function getName(id) {
-
-    switch (id) {
-
-        case "subham":
-            return "Subham";
-
-        case "subhankar":
-            return "Subhankar";
-
-        case "soumya":
-            return "Soumya";
-
-        default:
-            return id;
+        }
 
     }
 
