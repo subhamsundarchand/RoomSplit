@@ -194,6 +194,8 @@ function calculateSummary(expenses) {
     let monthlyDays = new Set();
 
     let balance = 0;
+    let yourPaidTotal = 0;
+let yourReceivedTotal = 0;
 
     let groceryTotal = 0;
 
@@ -206,6 +208,11 @@ let groceryPerHeadTotal = 0;
 
         const amount =
             Number(expense.amount) || 0;
+            if (expense.paidBy === currentUser) {
+
+    yourPaidTotal += amount;
+
+}
 
 
         /* ==========================================
@@ -356,11 +363,6 @@ document.getElementById(
     ).textContent =
         `${monthlyExpenses} expenses • Avg ₹${average.toFixed(0)}/day`;
 
-
-    document.getElementById(
-        "monthlyComparison"
-    ).textContent =
-        "— vs last month";
 
 
     /* ==========================================
