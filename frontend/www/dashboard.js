@@ -122,62 +122,335 @@ function calculateSummary(expenses) {
     const currentUser =
         localStorage.getItem("currentUser");
 
-    let total = 0;
+    const now = new Date();
+
+    const currentMonth =
+        now.getMonth();
+
+    const currentYear =
+        now.getFullYear();
+
+
+    /* ==========================================
+       VARIABLES
+    ========================================== */
+
+    let monthlyTotal = 0;
+
+    let monthlyExpenses = 0;
+
+    let monthlyDays = new Set();
+
+
+    let groceryTotal = 0;
+
+    let groceryExpenses = 0;
+
+    let groceryDays = new Set();
+
+    let groceryPerHeadTotal = 0;
+
+
+    let yourPaidTotal = 0;
+
+    let yourReceivedTotal = 0;
 
     let balance = 0;
+
+
+    /* ==========================================
+       PROCESS EXPENSES
+    ========================================== */
 
     expenses.forEach(expense => {
 
         const amount =
-            Number(expense.amount);
+            Number(expense.amount) || 0;
 
-        total += amount;
+        const expenseDate =
+            new Date(
+                expense.date || expense.createdAt
+            );
 
-        const members =
-            expense.members || [];
 
-        const share =
-            amount / members.length;
+        /* ==========================================
+           THIS MONTH - TOTAL ROOM SPENDING
+        ========================================== */
 
-        if (expense.paidBy === currentUser) {
+        if (
+            expenseDate.getMonth() === currentMonth &&
+            expenseDate.getFullYear() === currentYear
+        ) {
 
-            balance += amount;
+            monthlyTotal += amount;
+
+            monthlyExpenses++;
+
+            monthlyDays.add(
+                expenseDate.toISOString().split("T")[0]
+            );
 
         }
 
-        if (members.includes(currentUser)) {
 
-            balance -= share;
+        /* ==========================================
+           GROCERY
+        ========================================== */
+
+        if (
+            expense.category &&
+            expense.category.toLowerCase() === "grocery" &&
+            expenseDate.getMonth() === currentMonth &&
+            expenseDate.getFullYear() === currentYear
+        ) {
+
+            groceryTotal += amount;
+
+            groceryExpenses++;
+
+            groceryDays.add(
+                expenseDate.toISOString().split("T")[0]
+            );
+
+
+            const members =
+                expense.members || [];
+
+            const memberCount =
+                members.length;
+
+
+            if (memberCount > 0) {
+
+                groceryPerHeadTotal +=
+                    amount / memberCount;
+
+            }
 
         }
+
+
+        /* ==========================================
+           YOUR ACTUAL PAID AMOUNT
+        ========================================== */
+
+        if (
+            expense.paidBy === currentUser
+        ) {
+
+            yourPaidTotal += amount;
+
+        }
+
+
+        /* ==========================================
+           SETTLEMENTS
+        ========================================== */
+
+        const settlements =
+            expense.settlements || [];
+
+
+        settlements.forEach(settlement => {
+
+            const remaining =
+                Number(
+                    settlement.remainingAmount || 0
+                );
+
+
+            /*
+             * Money this user has already received
+             */
+
+            if (
+                settlement.to === currentUser
+            ) {
+
+                const paidAmount =
+                    Number(
+                        settlement.paidAmount || 0
+                    );
+
+                yourReceivedTotal +=
+                    paidAmount;
+
+            }
+
+
+            /*
+             * Current unpaid balance
+             */
+
+            if (remaining <= 0) {
+
+                return;
+
+            }
+
+
+            if (
+                settlement.from === currentUser
+            ) {
+
+                balance -= remaining;
+
+            }
+
+
+            if (
+                settlement.to === currentUser
+            ) {
+
+                balance += remaining;
+
+            }
+
+        });
 
     });
 
-    document.getElementById("totalExpense")
-        .textContent =
-        `₹${total.toFixed(2)}`;
+
+    /* ==========================================
+       YOUR CURRENT SPENDING
+    ========================================== */
+
+    const yourSpending =
+        yourPaidTotal -
+        yourReceivedTotal;
+
+
+    /* ==========================================
+       GROCERY AVERAGE
+    ========================================== */
+
+    const groceryDayCount =
+        groceryDays.size || 1;
+
+    const groceryAverage =
+        groceryTotal /
+        groceryDayCount;
+
+    const groceryPerHeadDaily =
+        groceryPerHeadTotal /
+        groceryDayCount;
+
+
+    /* ==========================================
+       MONTHLY AVERAGE
+    ========================================== */
+
+    const monthlyDayCount =
+        monthlyDays.size || 1;
+
+    const monthlyAverage =
+        monthlyTotal /
+        monthlyDayCount;
+
+
+    /* ==========================================
+       TOTAL ROOM SPENDING
+    ========================================== */
+
+    document.getElementById(
+        "monthlySpending"
+    ).textContent =
+        `₹${monthlyTotal.toFixed(2)}`;
+
+
+    document.getElementById(
+        "monthlySpendingMeta"
+    ).textContent =
+        `${monthlyExpenses} expenses • Avg ₹${monthlyAverage.toFixed(0)}/day`;
+
+
+    /* ==========================================
+       GROCERY CARD
+    ========================================== */
+
+    document.getElementById(
+        "grocerySpending"
+    ).textContent =
+        `₹${groceryTotal.toFixed(2)}`;
+
+
+    document.getElementById(
+        "groceryMeta"
+    ).textContent =
+        `${groceryExpenses} grocery expenses • Avg ₹${groceryAverage.toFixed(0)}/day`;
+
+
+    document.getElementById(
+        "groceryPerHead"
+    ).textContent =
+        `₹${groceryPerHeadDaily.toFixed(2)} per head/day`;
+
+
+    /* ==========================================
+       YOUR SPENDING
+    ========================================== */
+
+    const yourSpendingBox =
+        document.getElementById(
+            "yourSpending"
+        );
+
+
+    yourSpendingBox.textContent =
+        `₹${Math.max(0, yourSpending).toFixed(2)}`;
+
+
+    /* ==========================================
+       HAVE TO PAY
+    ========================================== */
 
     const balanceBox =
-        document.getElementById("yourBalance");
+        document.getElementById(
+            "yourBalance"
+        );
 
-    balanceBox.textContent =
-        `₹${balance.toFixed(2)}`;
+    const balanceStatus =
+        document.getElementById(
+            "balanceStatus"
+        );
 
-    if (balance > 0) {
 
-        balanceBox.style.color = "#22C55E";
+    if (balance > 0.01) {
+
+        balanceBox.textContent =
+            `₹${balance.toFixed(2)}`;
+
+        balanceBox.style.color =
+            "#22C55E";
+
+        balanceStatus.textContent =
+            "🟢 You will get";
 
     }
 
-    else if (balance < 0) {
+    else if (balance < -0.01) {
 
-        balanceBox.style.color = "#EF4444";
+        balanceBox.textContent =
+            `₹${Math.abs(balance).toFixed(2)}`;
+
+        balanceBox.style.color =
+            "#EF4444";
+
+        balanceStatus.textContent =
+            "🔴 You need to pay";
 
     }
 
     else {
 
-        balanceBox.style.color = "#ffffff";
+        balanceBox.textContent =
+            "₹0.00";
+
+        balanceBox.style.color =
+            "#22C55E";
+
+        balanceStatus.textContent =
+            "🟢 You're Settled";
 
     }
 
