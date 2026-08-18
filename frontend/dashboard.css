@@ -80,49 +80,160 @@ body{
    SUMMARY
 ========================================== */
 
-.summary{
+.summary {
 
-    display:grid;
+    display: grid;
 
-    grid-template-columns:repeat(2,1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
 
-    gap:20px;
+    gap: 20px;
 
-    margin-bottom:30px;
-
-}
-
-.summary-card{
-
-    background:var(--glass);
-
-    border:1px solid rgba(255,255,255,.08);
-
-    border-radius:20px;
-
-    padding:25px;
-
-    backdrop-filter:blur(20px);
-
-    box-shadow:0 15px 40px rgba(0,0,0,.30);
+    margin-bottom: 30px;
 
 }
 
-.summary-card h3{
+.summary-card {
 
-    color:var(--text-light);
+    background: var(--glass);
 
-    font-size:15px;
+    border: 1px solid rgba(255,255,255,.08);
 
-    margin-bottom:12px;
+    border-radius: 20px;
+
+    padding: 25px;
+
+    backdrop-filter: blur(20px);
+
+    box-shadow: 0 15px 40px rgba(0,0,0,.30);
+
+    transition: .25s ease;
+
+    min-width: 0;
 
 }
 
-.summary-card h1{
+.summary-card:hover {
 
-    font-size:34px;
+    transform: translateY(-3px);
 
-    font-weight:700;
+    border-color: rgba(255,255,255,.15);
+
+}
+
+.summary-card h3 {
+
+    color: var(--text-light);
+
+    font-size: 15px;
+
+    margin-bottom: 12px;
+
+}
+
+.summary-card h1 {
+
+    font-size: 34px;
+
+    font-weight: 700;
+
+    margin-bottom: 8px;
+
+}
+
+.summary-card p {
+
+    color: var(--text-light);
+
+    font-size: 13px;
+
+    margin: 0;
+
+}
+
+
+/* ==========================================
+   GROCERY
+========================================== */
+
+.grocery-card h1 {
+
+    color: #22C55E;
+
+}
+
+#grocerySpendingMeta strong {
+
+    display: block;
+
+    margin-top: 6px;
+
+    font-size: 13px;
+
+    color: var(--text-light);
+
+}
+
+
+/* ==========================================
+   HAVE TO PAY
+========================================== */
+
+.balance-section {
+
+    display: flex;
+
+    justify-content: center;
+
+    margin-bottom: 30px;
+
+}
+
+.balance-card {
+
+    width: 100%;
+
+    text-align: left;
+
+    padding: 22px 25px;
+
+}
+
+#balanceStatus {
+
+    font-weight: 600;
+
+    font-size: 14px;
+
+}
+
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 900px) {
+
+    .summary {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .summary-card {
+
+        padding: 22px;
+
+    }
+
+    .summary-card h1 {
+
+        font-size: 30px;
+
+    }
 
 }
 
@@ -311,112 +422,18 @@ body{
 
 }
 
-/* ==========================================
-   RESPONSIVE
-========================================== */
+@media (max-width: 900px) {
 
-@media(max-width:900px){
+    .summary {
 
-.summary{
+        grid-template-columns: 1fr;
 
-grid-template-columns:1fr;
+    }
 
-}
+    .quick-actions {
 
-.quick-actions{
+        grid-template-columns: 1fr;
 
-grid-template-columns:1fr;
-
-}
-
-}
-
-@media(max-width:600px){
-
-.top-bar h2{
-
-font-size:22px;
-
-}
-
-.summary-card h1{
-
-font-size:28px;
-
-}
-
-.action-card{
-
-padding:20px;
-
-}
-
-}
-/* ==========================================
-   DASHBOARD SUMMARY
-========================================== */
-
-.summary-card p {
-
-    margin-top: 6px;
-
-    color: var(--text-light);
-
-    font-size: 13px;
-
-}
-
-
-.summary-card span {
-
-    display: inline-block;
-
-    margin-top: 8px;
-
-    font-size: 13px;
-
-    font-weight: 600;
-
-}
-
-
-.comparison-up {
-
-    color: #EF4444;
-
-}
-
-
-.comparison-down {
-
-    color: #22C55E;
-
-}
-
-
-.comparison-neutral {
-
-    color: var(--text-light);
-
-}
-
-
-.balance-receive {
-
-    color: #22C55E;
-
-}
-
-
-.balance-pay {
-
-    color: #EF4444;
-
-}
-
-
-.balance-settled {
-
-    color: #ffffff;
+    }
 
 }
