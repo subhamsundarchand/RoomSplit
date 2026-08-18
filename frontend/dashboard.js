@@ -367,3 +367,26 @@ function calculateSummary(expenses) {
     }
 
 }
+/* ==========================================
+   USER NAME
+========================================== */
+
+function getName(id) {
+
+    switch (id) {
+
+        case "subham":
+            return "Subham";
+
+        case "subhankar":
+            return "Subhankar";
+
+        case "soumya":
+            return "Soumya";
+
+        default:
+            return id;
+
+    }
+
+}
