@@ -377,15 +377,10 @@ function calculateSummary(expenses) {
 
 
     document.getElementById(
-        "grocerySpendingMeta"
-    ).textContent =
-        `${groceryExpenses} grocery expenses • Avg ₹${groceryAverage.toFixed(0)}/day`;
-
-
-    document.getElementById(
-        "groceryPerHead"
-    ).textContent =
-        `₹${groceryPerHeadDaily.toFixed(2)} per head/day`;
+    "grocerySpendingMeta"
+).innerHTML =
+    `${groceryExpenses} grocery expenses • Avg ₹${groceryAverage.toFixed(0)}/day<br>
+     <strong>₹${groceryPerHeadDaily.toFixed(2)} per head/day</strong>`;
 
 
 /* ==========================================
