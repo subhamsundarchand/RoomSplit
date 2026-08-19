@@ -277,7 +277,7 @@ let balance = 0;
                         settlement.paidAmount || 0
                     );
 
-                yourReceivedTotal +=
+                yourSettlementReceivedTotal +=
                     paidAmount;
 
             }
