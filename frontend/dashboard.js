@@ -330,13 +330,6 @@ let balance = 0;
     /* ==========================================
        YOUR CURRENT SPENDING
     ========================================== */
-console.log("SPENDING DEBUG", {
-    currentUser,
-    yourPaidTotal,
-    yourSettlementPaidTotal,
-    yourSettlementReceivedTotal,
-    yourSpending
-});
     const yourSpending =
     yourPaidTotal -
     yourSettlementReceivedTotal +
