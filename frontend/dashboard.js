@@ -151,11 +151,14 @@ function calculateSummary(expenses) {
     let groceryPerHeadTotal = 0;
 
 
-    let yourPaidTotal = 0;
+   let yourPaidTotal = 0;
 
-    let yourReceivedTotal = 0;
+let yourSettlementPaidTotal = 0;
 
-    let balance = 0;
+let yourSettlementReceivedTotal = 0;
+
+let balance = 0;
+    
 
 
     /* ==========================================
@@ -318,8 +321,9 @@ function calculateSummary(expenses) {
     ========================================== */
 
     const yourSpending =
-        yourPaidTotal -
-        yourReceivedTotal;
+    yourPaidTotal -
+    yourSettlementReceivedTotal +
+    yourSettlementPaidTotal
 
 
     /* ==========================================
