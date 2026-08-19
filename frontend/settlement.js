@@ -151,158 +151,208 @@ function renderTransactions(settlements) {
 
     container.innerHTML = "";
 
-    let total = 0;
+    const netBalances = {};
+
+    /* ==========================================
+       NET SAME-PAIR TRANSACTIONS
+    ========================================== */
 
     settlements.forEach(item => {
 
-        const amount = Number(item.amount);
+        const from = item.from;
+        const to = item.to;
+        const amount = Number(item.amount) || 0;
 
-        total += amount;
+        if (!from || !to || amount <= 0) return;
 
-        let settlementDate = "";
+        const pair = [from, to].sort().join("_");
 
-        if (item.date) {
+        if (!netBalances[pair]) {
 
-            let date;
-
-            if (item.date.seconds) {
-
-                date =
-                    new Date(item.date.seconds * 1000);
-
-            }
-
-            else if (item.date._seconds) {
-
-                date =
-                    new Date(item.date._seconds * 1000);
-
-            }
-
-            else if (item.date.toDate) {
-
-                date =
-                    item.date.toDate();
-
-            }
-
-            else {
-
-                date =
-                    new Date(item.date);
-
-            }
-
-            if (!isNaN(date.getTime())) {
-
-                settlementDate =
-                    date.toLocaleDateString("en-IN", {
-
-                        day: "2-digit",
-
-                        month: "short",
-
-                        year: "numeric"
-
-                    });
-
-            }
+            netBalances[pair] = {
+                userA: [from, to].sort()[0],
+                userB: [from, to].sort()[1],
+                amountAB: 0,
+                amountBA: 0
+            };
 
         }
 
+        const pairData =
+            netBalances[pair];
+
+        if (
+            from === pairData.userA &&
+            to === pairData.userB
+        ) {
+
+            pairData.amountAB += amount;
+
+        }
+
+        else {
+
+            pairData.amountBA += amount;
+
+        }
+
+    });
+
+
+    /* ==========================================
+       CREATE FINAL NETTED TRANSACTIONS
+    ========================================== */
+
+    const finalSettlements = [];
+
+    Object.values(netBalances).forEach(pair => {
+
+        const difference =
+            pair.amountAB -
+            pair.amountBA;
+
+        if (Math.abs(difference) < 0.01) {
+
+            return;
+
+        }
+
+        if (difference > 0) {
+
+            finalSettlements.push({
+
+                from: pair.userA,
+
+                to: pair.userB,
+
+                amount: difference
+
+            });
+
+        }
+
+        else {
+
+            finalSettlements.push({
+
+                from: pair.userB,
+
+                to: pair.userA,
+
+                amount: Math.abs(difference)
+
+            });
+
+        }
+
+    });
+
+
+    /* ==========================================
+       RENDER
+    ========================================== */
+
+    let total = 0;
+
+    finalSettlements.forEach(item => {
+
+        const amount =
+            Number(item.amount);
+
+        total += amount;
+
         container.innerHTML += `
 
-        <div class="settlement-card">
+            <div class="settlement-card">
 
-            <div class="settlement-person">
+                <div class="settlement-person">
 
-                <span class="person-name">
-                    ${capitalize(item.from)}
-                </span>
+                    <span class="person-name">
+                        ${capitalize(item.from)}
+                    </span>
 
-                <span class="arrow">
-                    →
-                </span>
+                    <span class="arrow">
+                        →
+                    </span>
 
-                <span class="person-name receiver">
-                    ${capitalize(item.to)}
-                </span>
+                    <span class="person-name receiver">
+                        ${capitalize(item.to)}
+                    </span>
+
+                </div>
+
+
+                <div class="settlement-details">
+
+                    <span class="payment-label">
+                        will pay to
+                    </span>
+
+                    <strong class="payment-amount">
+                        ₹${amount.toFixed(2)}
+                    </strong>
+
+                </div>
+
+
+                <div class="settlement-status">
+
+                    <span class="pending-badge">
+                        🟡 Pending
+                    </span>
+
+                    <button
+                        type="button"
+                        class="settle-btn"
+                        onclick="
+                            openSettleModal(
+                                '${item.from}',
+                                '${item.to}',
+                                ${amount}
+                            )
+                        "
+                    >
+                        💰 Settle
+                    </button>
+
+                </div>
 
             </div>
-
-
-            <div class="settlement-details">
-
-                <span class="payment-label">
-                    will pay to
-                </span>
-
-                <strong class="payment-amount">
-                    ₹${amount.toFixed(2)}
-                </strong>
-
-            </div>
-
-
-            <div class="settlement-date">
-
-                📅 ${settlementDate}
-
-            </div>
-
-
-            <div class="settlement-status">
-
-    <span class="pending-badge">
-        🟡 Pending
-    </span>
-
-    <button
-    type="button"
-    class="settle-btn"
-    onclick="
-        openSettleModal(
-            '${item.from}',
-            '${item.to}',
-            ${amount}
-        )
-    "
->
-    💰 Settle
-</button>
-
-</div>
-
-        </div>
 
         `;
 
     });
 
 
-    document.getElementById("overallExpense").textContent =
+    document.getElementById(
+        "overallExpense"
+    ).textContent =
         `₹${total.toFixed(2)}`;
 
 
-    if (settlements.length === 0) {
+    /* ==========================================
+       EMPTY
+    ========================================== */
+
+    if (finalSettlements.length === 0) {
 
         container.innerHTML = `
 
-        <div class="settlement-card empty-settlement">
+            <div class="settlement-card empty-settlement">
 
-            <div class="empty-icon">
-                🎉
+                <div class="empty-icon">
+                    🎉
+                </div>
+
+                <strong>
+                    Everyone is Settled Up!
+                </strong>
+
+                <small>
+                    No pending payments
+                </small>
+
             </div>
-
-            <strong>
-                Everyone is Settled Up!
-            </strong>
-
-            <small>
-                No pending payments
-            </small>
-
-        </div>
 
         `;
 
