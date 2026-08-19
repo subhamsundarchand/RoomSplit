@@ -377,7 +377,7 @@ function calculateSummary(expenses) {
 
 
     document.getElementById(
-        "groceryMeta"
+        "grocerySpendingMeta"
     ).textContent =
         `${groceryExpenses} grocery expenses • Avg ₹${groceryAverage.toFixed(0)}/day`;
 
