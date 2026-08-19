@@ -258,60 +258,71 @@ let balance = 0;
 
         settlements.forEach(settlement => {
 
-            const remaining =
-                Number(
-                    settlement.remainingAmount || 0
-                );
+    const remaining =
+        Number(settlement.remainingAmount || 0);
+
+    /* ==========================================
+       ACTUAL CASH / UPI PAYMENTS
+    ========================================== */
+
+    const payments =
+        Array.isArray(settlement.payments)
+            ? settlement.payments
+            : [];
+
+    const actualPaid =
+        payments.reduce(
+            (total, payment) =>
+                total + (Number(payment.amount) || 0),
+            0
+        );
 
 
-            /*
-             * Money this user has already received
-             */
+    /* ==========================================
+       SETTLEMENT MONEY PAID
+    ========================================== */
 
-            if (
-                settlement.to === currentUser
-            ) {
+    if (settlement.from === currentUser) {
 
-                const paidAmount =
-                    Number(
-                        settlement.paidAmount || 0
-                    );
+        yourSettlementPaidTotal +=
+            actualPaid;
 
-                yourSettlementReceivedTotal +=
-                    paidAmount;
-
-            }
+    }
 
 
-            /*
-             * Current unpaid balance
-             */
+    /* ==========================================
+       SETTLEMENT MONEY RECEIVED
+    ========================================== */
 
-            if (remaining <= 0) {
+    if (settlement.to === currentUser) {
 
-                return;
+        yourSettlementReceivedTotal +=
+            actualPaid;
 
-            }
-
-
-            if (
-                settlement.from === currentUser
-            ) {
-
-                balance -= remaining;
-
-            }
+    }
 
 
-            if (
-                settlement.to === currentUser
-            ) {
+    /* ==========================================
+       REMAINING BALANCE
+    ========================================== */
 
-                balance += remaining;
+    if (remaining > 0) {
 
-            }
+        if (settlement.from === currentUser) {
 
-        });
+            balance -= remaining;
+
+        }
+
+        if (settlement.to === currentUser) {
+
+            balance += remaining;
+
+        }
+
+    }
+
+});
 
     });
 
@@ -319,7 +330,13 @@ let balance = 0;
     /* ==========================================
        YOUR CURRENT SPENDING
     ========================================== */
-
+console.log("SPENDING DEBUG", {
+    currentUser,
+    yourPaidTotal,
+    yourSettlementPaidTotal,
+    yourSettlementReceivedTotal,
+    yourSpending
+});
     const yourSpending =
     yourPaidTotal -
     yourSettlementReceivedTotal +
