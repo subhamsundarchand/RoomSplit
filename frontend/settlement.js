@@ -567,6 +567,36 @@ function openSettleModal(from, to, amount) {
     document.getElementById("settleAmount")
         .textContent =
         `₹${Number(amount).toFixed(2)}`;
+        const payInput =
+    document.getElementById("settlePayAmount");
+
+payInput.value = "";
+
+payInput.max =
+    Number(amount).toFixed(2);
+
+document.getElementById(
+    "settleRemaining"
+).textContent =
+    `Remaining after payment: ₹${Number(amount).toFixed(2)}`;
+
+payInput.oninput = function () {
+
+    const paying =
+        Number(this.value) || 0;
+
+    const remaining =
+        Math.max(
+            0,
+            Number(amount) - paying
+        );
+
+    document.getElementById(
+        "settleRemaining"
+    ).textContent =
+        `Remaining after payment: ₹${remaining.toFixed(2)}`;
+
+};
 
 
     modal.dataset.from = from;
@@ -603,6 +633,10 @@ function closeSettleModal() {
    CONFIRM PAYMENT
 ========================================== */
 
+/* ==========================================
+   CONFIRM PAYMENT
+========================================== */
+
 async function confirmSettlementPayment() {
 
     const modal =
@@ -617,19 +651,31 @@ async function confirmSettlementPayment() {
         modal.dataset.to;
 
 
-    const amount =
+    const pendingAmount =
         Number(modal.dataset.amount);
+
+
+    const payInput =
+        document.getElementById("settlePayAmount");
+
+
+    const amount =
+        Number(payInput.value);
 
 
     const method =
         selectedPaymentMethod;
 
 
+    /* ==========================================
+       VALIDATION
+    ========================================== */
+
     if (
         !from ||
         !to ||
-        !Number.isFinite(amount) ||
-        amount <= 0
+        !Number.isFinite(pendingAmount) ||
+        pendingAmount <= 0
     ) {
 
         showToast(
@@ -641,6 +687,69 @@ async function confirmSettlementPayment() {
 
     }
 
+
+    if (
+        !Number.isFinite(amount) ||
+        amount <= 0
+    ) {
+
+        showToast(
+            "Enter a valid payment amount",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if (
+        amount >
+        pendingAmount + 0.01
+    ) {
+
+        showToast(
+            `You cannot pay more than ₹${pendingAmount.toFixed(2)}`,
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const remaining =
+        Math.max(
+            0,
+            pendingAmount - amount
+        );
+
+
+    /* ==========================================
+       CONFIRM
+    ========================================== */
+
+    const confirmed =
+        confirm(
+
+            `${capitalize(from)} will pay ` +
+            `${capitalize(to)} ₹${amount.toFixed(2)}\n\n` +
+
+            `Method: ${method}\n` +
+
+            `Remaining: ₹${remaining.toFixed(2)}\n\n` +
+
+            `Confirm payment?`
+
+        );
+
+
+    if (!confirmed) return;
+
+
+    /* ==========================================
+       API
+    ========================================== */
 
     try {
 
@@ -704,7 +813,7 @@ async function confirmSettlementPayment() {
 
 
         showToast(
-            `${method} payment recorded`,
+            `${method} payment of ₹${amount.toFixed(2)} recorded`,
             "success"
         );
 
@@ -712,6 +821,7 @@ async function confirmSettlementPayment() {
         await loadSettlement();
 
     }
+
 
     catch (err) {
 
