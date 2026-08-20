@@ -327,13 +327,86 @@ let balance = 0;
     });
 
 
-    /* ==========================================
-       YOUR CURRENT SPENDING
-    ========================================== */
-    const yourSpending =
-    yourPaidTotal -
-    yourSettlementReceivedTotal +
-    yourSettlementPaidTotal
+/* ==========================================
+   YOUR SPENDING
+   Your expense share + money still owed to you
+========================================== */
+
+let yourExpenseShare = 0;
+
+let yourPendingReceive = 0;
+
+
+/* ==========================================
+   CALCULATE YOUR EXPENSE SHARE
+========================================== */
+
+expenses.forEach(expense => {
+
+    const amount =
+        Number(expense.amount) || 0;
+
+    const members =
+        Array.isArray(expense.members)
+            ? expense.members
+            : [];
+
+
+    if (
+        members.includes(currentUser) &&
+        members.length > 0
+    ) {
+
+        yourExpenseShare +=
+            amount / members.length;
+
+    }
+
+});
+
+
+/* ==========================================
+   CALCULATE MONEY STILL OWED TO YOU
+========================================== */
+
+expenses.forEach(expense => {
+
+    const settlements =
+        Array.isArray(expense.settlements)
+            ? expense.settlements
+            : [];
+
+
+    settlements.forEach(settlement => {
+
+        const remaining =
+            Number(
+                settlement.remainingAmount || 0
+            );
+
+
+        if (
+            settlement.to === currentUser &&
+            remaining > 0
+        ) {
+
+            yourPendingReceive +=
+                remaining;
+
+        }
+
+    });
+
+});
+
+
+/* ==========================================
+   FINAL YOUR SPENDING
+========================================== */
+
+const yourSpending =
+    yourExpenseShare +
+    yourPendingReceive;
 
 
     /* ==========================================
