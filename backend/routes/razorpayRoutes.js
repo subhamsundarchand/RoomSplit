@@ -11,16 +11,25 @@ router.get("/test", (req, res) => {
     });
 });
 
-const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET
-});
-
+const razorpay =
+    process.env.RAZORPAY_KEY_ID &&
+    process.env.RAZORPAY_KEY_SECRET
+        ? new Razorpay({
+            key_id: process.env.RAZORPAY_KEY_ID,
+            key_secret: process.env.RAZORPAY_KEY_SECRET
+        })
+        : null;
 // ==========================================
 // CREATE RAZORPAY ORDER
 // ==========================================
 
 router.post("/create-order", async (req, res) => {
+    if (!razorpay) {
+    return res.status(503).json({
+        success: false,
+        message: "Razorpay is not configured"
+    });
+}
 
     try {
 
